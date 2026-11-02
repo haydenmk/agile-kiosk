@@ -643,8 +643,8 @@ body.kiosk-full-mode #kiosk-app {
 .news-ticker-bar {
   display: flex;
   align-items: center;
-  background: var(--bg-light);
-  border: 1px solid var(--surface-border);
+  background: var(--uhmc-navy);
+  border: 1px solid var(--surface-border-gold);
   border-radius: var(--radius-md);
   overflow: hidden;
   height: 38px;
@@ -694,7 +694,7 @@ body.kiosk-full-mode #kiosk-app {
 /* Touch Begin Banner (Wireframe Bottom) */
 .touch-begin-banner {
   position: relative;
-  background: var(--bg-light);
+  background: var(--uhmc-primary);
   border: 2px solid var(--uh-gold);
   border-radius: var(--radius-lg);
   padding: 16px 20px;
