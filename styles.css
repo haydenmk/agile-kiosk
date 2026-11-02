@@ -431,7 +431,7 @@ body.kiosk-full-mode #kiosk-app {
 
 .flyer-lead {
   font-size: 13px;
-  color: #cbd5e1;
+  color: var(--uhmc-slate);
   line-height: 1.4;
   margin-bottom: 10px;
 }
@@ -636,7 +636,7 @@ body.kiosk-full-mode #kiosk-app {
   gap: 8px;
   font-size: 11px;
   font-weight: 600;
-  color: #cbd5e1;
+  color: var(--uhmc-slate);
 }
 
 /* Scrolling News Ticker */
@@ -783,7 +783,7 @@ body.kiosk-full-mode #kiosk-app {
 
 .banner-content p {
   font-size: 12px;
-  color: #cbd5e1;
+  color: var(--uhmc-slate);
   line-height: 1.4;
 }
 
@@ -1109,7 +1109,7 @@ body.kiosk-full-mode #kiosk-app {
   font-weight: 700;
   background: var(--surface-card);
   border: 1.5px solid var(--surface-border);
-  color: var(--text-muted);
+  color: var(--text-primary);
   transition: all 0.2s;
 }
 
@@ -1286,7 +1286,7 @@ body.kiosk-full-mode #kiosk-app {
   border-radius: var(--radius-md);
   padding: 12px 16px;
   font-size: 13px;
-  color: #cbd5e1;
+  color: var(--uhmc-slate);
   line-height: 1.45;
 }
 
@@ -1342,7 +1342,7 @@ body.kiosk-full-mode #kiosk-app {
   border-radius: var(--radius-full);
   font-size: 11px;
   font-weight: 600;
-  color: #cbd5e1;
+  color: var(--uhmc-slate);
 }
 
 /* Advisor Card */
@@ -1525,7 +1525,7 @@ body.kiosk-full-mode #kiosk-app {
 
 .sel-job-desc {
   font-size: 12px;
-  color: #cbd5e1;
+  color: var(--uhmc-slate);
   line-height: 1.4;
   margin-bottom: 12px;
 }
@@ -1624,7 +1624,7 @@ body.kiosk-full-mode #kiosk-app {
 }
 
 .job-pill.active {
-  background: var(--bg-light);
+  background: var(--uhmc-primary);
   border-color: var(--uh-gold);
   color: #ffffff;
 }
@@ -1655,7 +1655,7 @@ body.kiosk-full-mode #kiosk-app {
 }
 
 .job-row-item.selected {
-  background: var(--bg-light);
+  background: var(--uhmc-primary);
   border-color: var(--uh-gold);
   box-shadow: 0 0 12px rgba(255, 182, 0, 0.25);
 }
@@ -1668,7 +1668,7 @@ body.kiosk-full-mode #kiosk-app {
 .row-job-title {
   font-size: 13px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .row-job-meta {
@@ -1693,7 +1693,7 @@ body.kiosk-full-mode #kiosk-app {
 .page-btn {
   padding: 6px 14px;
   border-radius: var(--radius-sm);
-  background: var(--surface-card);
+  background: var(--uhmc-primary);
   border: 1px solid var(--surface-border);
   font-size: 12px;
   font-weight: 700;
@@ -1758,7 +1758,7 @@ body.kiosk-full-mode #kiosk-app {
 
 .flyer-art-content p {
   font-size: 11px;
-  color: #cbd5e1;
+  color: var(--uhmc-slate);
 }
 
 .featured-event-content {
@@ -1772,7 +1772,7 @@ body.kiosk-full-mode #kiosk-app {
 }
 
 .tag-featured {
-  background: var(--bg-light);
+  background: var(--uhmc-primary);
   border: 1px solid var(--uh-gold);
   color: var(--uh-gold-light);
   font-size: 10px;
@@ -1794,7 +1794,7 @@ body.kiosk-full-mode #kiosk-app {
   font-family: 'Outfit', sans-serif;
   font-size: 18px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text-primary);
   margin-bottom: 6px;
 }
 
@@ -1810,7 +1810,7 @@ body.kiosk-full-mode #kiosk-app {
 
 .featured-event-summary {
   font-size: 12px;
-  color: #cbd5e1;
+  color: var(--uhmc-slate);
   line-height: 1.4;
   margin-bottom: 12px;
 }
@@ -1853,7 +1853,7 @@ body.kiosk-full-mode #kiosk-app {
   font-family: 'Outfit', sans-serif;
   font-size: 13px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .rsvp-text p {
@@ -1882,7 +1882,7 @@ body.kiosk-full-mode #kiosk-app {
 }
 
 .event-time-btn.active {
-  background: var(--bg-light);
+  background: var(--uhmc-primary);
   border-color: var(--uh-gold);
   color: #ffffff;
   box-shadow: 0 0 14px rgba(255, 182, 0, 0.25);
@@ -1942,7 +1942,7 @@ body.kiosk-full-mode #kiosk-app {
 .event-item-title {
   font-size: 13px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .event-item-sub {
@@ -1977,7 +1977,7 @@ body.kiosk-full-mode #kiosk-app {
   font-family: 'Outfit', sans-serif;
   font-size: 12px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .survey-progress-bar {
@@ -2007,7 +2007,7 @@ body.kiosk-full-mode #kiosk-app {
   font-family: 'Outfit', sans-serif;
   font-size: 20px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text-primary);
   line-height: 1.3;
 }
 
@@ -2063,7 +2063,7 @@ body.kiosk-full-mode #kiosk-app {
   gap: 8px;
   font-size: 12px;
   font-weight: 600;
-  color: #cbd5e1;
+  color: var(--text-primary);
   text-align: left;
   transition: all 0.15s;
 }
@@ -2073,7 +2073,7 @@ body.kiosk-full-mode #kiosk-app {
 }
 
 .survey-opt-btn.checked {
-  background: var(--bg-light);
+  background: var(--uhmc-primary);
   border-color: var(--uh-gold);
   color: #ffffff;
   box-shadow: 0 0 14px rgba(255, 182, 0, 0.25);
@@ -2125,7 +2125,7 @@ body.kiosk-full-mode #kiosk-app {
 .survey-btn-next {
   padding: 12px 32px;
   border-radius: var(--radius-md);
-  background: var(--bg-light);
+  background: var(--uhmc-primary);
   border: 2px solid var(--uh-gold);
   font-family: 'Outfit', sans-serif;
   font-size: 14px;
@@ -2138,7 +2138,7 @@ body.kiosk-full-mode #kiosk-app {
 .survey-results-view {
   position: absolute;
   inset: 0;
-  background: rgba(7, 13, 18, 0.98);
+  background: rgba(0, 49, 60, 0.98);
   border-radius: var(--radius-lg);
   padding: 20px;
   display: flex;
@@ -2212,7 +2212,7 @@ body.kiosk-full-mode #kiosk-app {
 
 .results-done-btn {
   padding: 12px 24px;
-  background: var(--bg-light);
+  background: var(--uhmc-primary);
   border: 2px solid var(--uh-gold);
   border-radius: var(--radius-md);
   font-family: 'Outfit', sans-serif;
@@ -2280,7 +2280,7 @@ body.kiosk-full-mode #kiosk-app {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 12px;
   font-weight: 600;
 }
@@ -2302,7 +2302,7 @@ body.kiosk-full-mode #kiosk-app {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #121c24;
+  background: var(--uhmc-primary-dark);
   border-bottom: 1px solid var(--surface-border);
   padding: 6px 12px;
 }
@@ -2330,7 +2330,7 @@ body.kiosk-full-mode #kiosk-app {
 .browser-viewport {
   flex: 1;
   overflow-y: auto;
-  background: #070e14;
+  background: var(--bg-light);
   padding: 14px;
 }
 
@@ -2364,7 +2364,7 @@ body.kiosk-full-mode #kiosk-app {
 
 .launch-hero p {
   font-size: 11px;
-  color: #cbd5e1;
+  color: var(--uhmc-slate);
 }
 
 .web-destinations-grid {
@@ -2706,7 +2706,7 @@ body.kiosk-full-mode #kiosk-app {
 
 .help-item p {
   font-size: 11px;
-  color: #cbd5e1;
+  color: var(--uhmc-slate);
   line-height: 1.4;
 }
 
