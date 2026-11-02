@@ -717,16 +717,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <!-- Animated Walking Route to Selected Room -->
           ${activeItem && activeItem.path ? `
-            <path d="${activeItem.path}" fill="none" stroke="#C59B27" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="walking-route-path"/>
+            <path d="${activeItem.path}" fill="none" stroke="#ffb600" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="walking-route-path"/>
           ` : ''}
 
           <!-- Room Nodes -->
           ${floorRooms.map(r => `
             <g class="map-room-node ${r.room === (activeItem ? activeItem.room : '') ? 'highlighted' : ''}" data-room="${r.room}">
               <rect class="map-room-rect" x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" rx="6"
-                    fill="rgba(2, 71, 49, 0.7)" stroke="#0d694b" stroke-width="1.5" />
+                    fill="rgba(0, 79, 110, 0.75)" stroke="#004f6e" stroke-width="1.5" />
               <text x="${r.x + r.w / 2}" y="${r.y + r.h / 2 - 2}" fill="#FFFFFF" font-size="10" font-weight="800" text-anchor="middle">${r.room}</text>
-              <text x="${r.x + r.w / 2}" y="${r.y + r.h / 2 + 10}" fill="#C59B27" font-size="7" font-weight="700" text-anchor="middle">${r.catLabel}</text>
+              <text x="${r.x + r.w / 2}" y="${r.y + r.h / 2 + 10}" fill="#ffb600" font-size="7" font-weight="700" text-anchor="middle">${r.catLabel}</text>
             </g>
           `).join('')}
 

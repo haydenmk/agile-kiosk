@@ -2,7 +2,7 @@
 
 An interactive touchscreen digital signage web application prototype designed for the two 43” commercial touchscreen kiosks on the 1st and 2nd floors of the Ka Lama building at **University of Hawaiʻi Maui College (UHMC)**.
 
-Built in exact accordance with the 8-screen wireframe specifications in [`UHMC Kiosk Lo-Fi Wireframes.pdf`](UHMC%20Kiosk%20Lo-Fi%20Wireframes.pdf) using modern UHMC brand styling (Hawaiian emerald green `#024731` and gold `#C59B27` accents).
+Built in exact accordance with the 8-screen wireframe specifications in [`UHMC Kiosk Lo-Fi Wireframes.pdf`](UHMC%20Kiosk%20Lo-Fi%20Wireframes.pdf) using official UHMC brand styling (UHMC Ocean Blue Pantone 3025 C `#004f6e`, Deep Teal `#00313c`, and UHMC Gold Pantone 7549 C `#ffb600`).
 
 ---
 
