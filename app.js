@@ -159,6 +159,77 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   ];
 
+  const spreadsheetContacts = {
+    "KL-101": ["Pai Ka Mana", "EOC"],
+    "KL-106": ["Veteran's Resource Center"],
+    "KL-110": ["Paul Thornton, Social Science"],
+    "KL-111": ["Julie Powers, Social Science"],
+    "KL-112": ["Gemma Medina, Early Childhood Education"],
+    "KL-113": ["Leanne Higa, Dental Hygiene"],
+    "KL-114": ["Tim Botkin, STEM Department"],
+    "KL-115": ["Meagan Jones, STEM Department"],
+    "KL-117": ["Charlie Schlather, Humanities and Social Science"],
+    "KL-119": ["Ron St. John, Humanities"],
+    "KL-120": ["Selene LeGare, Social Science"],
+    "KL-121": ["Melissa Kirkendall, Social Science"],
+    "KL-122": ["Liping Liu, PhD, Business and Hospitality"],
+    "KL-123": ["Liana Horovitz, Humanities"],
+    "KL-125": ["Velma Panlasigui, Humanities and Social Science", "Cathy Yago, Title III"],
+    "KL-126": ["STEM Department Lecturers"],
+    "KL-127": ["Hawaii Child Welfare CQI"],
+    "KL-131": ["Marshall Norman - Good Jobs Hawaii"],
+    "KL-201": ["Allied Health Lab"],
+    "KL-203": ["Allied Health Lab"],
+    "KL-214": ["Papaikani'au Kai'anui"],
+    "KL-215": ["Aubrey Matsuura, Hawaiian Studies"],
+    "KL-217": ["Business Administration Lecturers"],
+    "KL-218": ["Gil Logan, Business"],
+    "KL-219": ["Lorelle Solanzo Peros, Business & Hospitality"],
+    "KL-230": ["Rosiana (Nani) Azman, Social Science"],
+    "KL-231": ["Aubrey Weston, Business & Hospitality (Accounting)"],
+    "KL-232": ["Financial Aid Director"],
+    "KL-233": ["Nicholas Winfrey - Maui United Way"],
+    "KL-234": ["Vincent Domingo, Business & Hospitality"],
+    "KL-235": ["Jeff Scharnhorst/Stephan Johnson"]
+  };
+
+  const spreadsheetRooms = [
+    [1, 106], [1, 110], [1, 111], [1, 112], [1, 113], [1, 114], [1, 115],
+    [1, 116], [1, 117], [1, 118], [1, 119], [1, 120], [1, 121], [1, 122],
+    [1, 123], [1, 124], [1, 125], [1, 126], [1, 127], [1, 130], [1, 131],
+    [1, 132], [1, 133], [1, 134], [1, 135], [2, 211], [2, 212], [2, 213],
+    [2, 214], [2, 215], [2, 216], [2, 217], [2, 218], [2, 219], [2, 230],
+    [2, 231], [2, 232], [2, 233], [2, 234], [2, 235]
+  ];
+
+  spreadsheetRooms.forEach(([floor, roomNumber]) => {
+    const room = `KL-${roomNumber}`;
+    if (!directoryData.some(item => item.room === room)) {
+      directoryData.push({
+        floor,
+        room,
+        name: `Room ${roomNumber}`,
+        category: "offices",
+        catLabel: "Directory",
+        desc: "Building directory contact",
+        x: 0,
+        y: 0,
+        w: 0,
+        h: 0,
+        path: ""
+      });
+    }
+  });
+
+  function getRoomContact(room) {
+    return spreadsheetContacts[room.room] || [];
+  }
+
+  function getRoomDisplayName(room) {
+    const contacts = getRoomContact(room);
+    return contacts.length > 0 ? contacts.join(" · ") : room.name;
+  }
+
   // --- MOCK DATA: ACADEMIC PROGRAMS ---
   const programsData = {
     business: {
@@ -627,7 +698,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
   function initDirectoryModule() {
     const floorPills = document.querySelectorAll('.floor-pill-btn');
-    const catChips = document.querySelectorAll('.cat-chip');
     const searchInput = document.getElementById('input-dir-search');
     const clearBtn = document.getElementById('btn-clear-dir-search');
     const listContainer = document.getElementById('dir-list-container');
@@ -646,10 +716,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const filtered = floorRooms.filter(r => {
         const matchesCat = state.activeCategory === 'all' || r.category === state.activeCategory;
+        const contactText = getRoomContact(r).join(' ');
         const matchesQuery = !query ||
           r.room.toLowerCase().includes(query) ||
           r.name.toLowerCase().includes(query) ||
-          r.desc.toLowerCase().includes(query);
+          r.desc.toLowerCase().includes(query) ||
+          contactText.toLowerCase().includes(query);
         return matchesCat && matchesQuery;
       });
 
@@ -666,8 +738,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="dir-row-left">
               <span class="dir-room-tag">${item.room}</span>
               <div>
-                <div class="dir-name-title">${item.name}</div>
-                <div class="dir-cat-sub">${item.desc}</div>
+                <div class="dir-name-title">${getRoomDisplayName(item)}</div>
+                <div class="dir-cat-sub">${getRoomContact(item).length ? `Room ${item.room.replace('KL-', '')}` : item.desc}</div>
               </div>
             </div>
             <span class="dir-chevron">›</span>
@@ -682,68 +754,110 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // Render SVG Map
       renderSvgFloorMap(floorRooms);
     }
 
     function renderSvgFloorMap(floorRooms) {
       const activeItem = directoryData.find(r => r.room === state.selectedRoom && r.floor === state.activeFloor) || floorRooms[0];
       if (activeItem) {
-        roomPill.textContent = `Selected: Rm ${activeItem.room} · ${activeItem.name}`;
+        roomPill.textContent = `Selected: Rm ${activeItem.room} · ${getRoomDisplayName(activeItem)}`;
       }
 
-      // SVG Base size
-      const viewBoxWidth = 460 / state.mapZoom;
-      const viewBoxHeight = 165 / state.mapZoom;
-      const minX = (460 - viewBoxWidth) / 2;
-      const minY = (165 - viewBoxHeight) / 2;
+      const floorOne = state.activeFloor === 1;
+      const rooms = floorOne ? [
+        ['130', 450, 12, 49, 83, '#4d91dc'], ['131', 503, 12, 49, 83, '#82d044'],
+        ['132', 555, 12, 47, 83, '#fff8e8'], ['133', 604, 12, 49, 83, '#fff8e8'],
+        ['134', 656, 12, 49, 83, '#4d91dc'], ['135', 708, 12, 49, 83, '#fff8e8'],
+        ['103A', 768, 86, 70, 53, '#fff8e8'], ['101', 450, 141, 80, 170, '#82d044'],
+        ['A', 532, 141, 56, 55, '#fff8e8'], ['105', 532, 201, 56, 110, '#fff8e8'],
+        ['103', 592, 141, 246, 170, '#fff8e8'], ['137', 485, 275, 45, 35, '#fff8e8'],
+        ['102', 522, 352, 85, 170, '#fff8e8'], ['104A', 610, 352, 113, 170, '#fff8e8'],
+        ['104B', 725, 352, 113, 170, '#fff8e8'],
+        ['124', 10, 200, 72, 49, '#fff8e8'], ['123', 10, 253, 72, 49, '#4d91dc'],
+        ['122', 10, 307, 72, 49, '#4d91dc'], ['121', 10, 361, 72, 49, '#4d91dc'],
+        ['120', 10, 415, 72, 49, '#4d91dc'], ['119', 10, 469, 72, 49, '#4d91dc'],
+        ['118', 10, 523, 72, 49, '#fff8e8'], ['117', 10, 577, 72, 49, '#4d91dc'],
+        ['125', 121, 200, 84, 52, '#4d91dc'], ['126', 121, 254, 84, 54, '#4d91dc'],
+        ['127', 121, 310, 84, 56, '#82d044'], ['107', 208, 200, 100, 168, '#fff8e8'],
+        ['109', 121, 410, 103, 157, '#fff8e8'], ['108', 226, 410, 110, 157, '#fff8e8'],
+        ['106', 338, 410, 61, 118, '#82d044'], ['110', 338, 530, 61, 36, '#4d91dc'],
+        ['116', 130, 613, 42, 96, '#fff8e8'], ['115', 175, 613, 43, 96, '#4d91dc'],
+        ['114', 220, 613, 43, 96, '#4d91dc'], ['113', 265, 613, 43, 96, '#4d91dc'],
+        ['112', 310, 613, 43, 96, '#4d91dc'], ['111', 355, 613, 43, 96, '#4d91dc']
+      ] : [
+        ['230', 447, 15, 49, 80, '#4d91dc'], ['231', 500, 15, 49, 80, '#4d91dc'],
+        ['232', 552, 15, 49, 80, '#ffd21a'], ['233', 604, 15, 49, 80, '#82d044'],
+        ['234', 656, 15, 49, 80, '#4d91dc'], ['235', 708, 15, 49, 80, '#fff8e8'],
+        ['201', 447, 150, 176, 163, '#ffd21a'], ['203', 628, 150, 176, 163, '#ffd21a'],
+        ['203A', 628, 199, 40, 80, '#fff8e8'], ['202', 520, 340, 157, 162, '#fff8e8'],
+        ['204', 682, 340, 154, 162, '#fff8e8'], ['207', 99, 212, 211, 163, '#fff8e8'],
+        ['209', 9, 212, 88, 150, '#fff8e8'], ['208', 119, 420, 135, 156, '#fff8e8'],
+        ['206', 258, 420, 141, 156, '#fff8e8'], ['221', 9, 367, 72, 49, '#fff8e8'],
+        ['220', 9, 419, 72, 49, '#fff8e8'], ['219', 9, 470, 72, 50, '#4d91dc'],
+        ['218', 9, 523, 72, 50, '#4d91dc'], ['217', 9, 576, 72, 50, '#4d91dc'],
+        ['216', 128, 616, 43, 93, '#fff8e8'], ['215', 174, 616, 43, 93, '#4d91dc'],
+        ['214', 220, 616, 43, 93, '#4d91dc'], ['213', 266, 616, 43, 93, '#fff8e8'],
+        ['212', 312, 616, 43, 93, '#fff8e8'], ['211', 358, 616, 43, 93, '#fff8e8']
+      ];
+
+      const selectableRooms = new Set(floorRooms.map(room => room.room.replace('KL-', '')));
+      const zoom = state.mapZoom;
+      const viewWidth = 850 / zoom;
+      const viewHeight = 719 / zoom;
+      const minX = (850 - viewWidth) / 2;
+      const minY = (719 - viewHeight) / 2;
+      const roomSvg = rooms.map(([label, x, y, w, h, fill]) => {
+        const code = `KL-${label}`;
+        const selectable = selectableRooms.has(label);
+        const selected = activeItem && activeItem.room === code;
+        return `
+          <g class="map-room-node ${selected ? 'highlighted' : ''} ${selectable ? '' : 'map-room-static'}" ${selectable ? `data-room="${code}"` : ''}>
+            <rect class="map-room-rect" x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff8e8" stroke="#202526" stroke-width="3"/>
+            <text x="${x + w / 2}" y="${y + h / 2 + 7}" fill="#202526" font-size="${w < 60 ? 14 : 22}" font-weight="800" text-anchor="middle">${label}</text>
+          </g>`;
+      }).join('');
+
+      const stairSvg = (x, y, w, h) => `
+        <g class="map-stairs">
+          <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="#5bd4f5" stroke="#202526" stroke-width="3"/>
+          <path d="M${x + 14} ${y + 18}h${w - 28}m0 12H${x + 14}m0 12h${w - 28}m0 12H${x + 14}m0 12h${w - 28}"
+                stroke="#202526" stroke-width="5"/>
+          <path d="M${x + w / 2} ${y + 10}v${h - 20}" stroke="#202526" stroke-width="5"/>
+        </g>`;
+
+      const stairs = floorOne
+        ? `${stairSvg(767, 12, 72, 72)}${stairSvg(10, 626, 98, 83)}`
+        : `${stairSvg(766, 14, 70, 82)}${stairSvg(8, 630, 98, 79)}`;
+      const restroomSvg = (x, y, label) => `
+        <g class="map-room-static">
+          <rect x="${x}" y="${y}" width="87" height="70" rx="3" fill="#60ded8" stroke="#202526" stroke-width="3"/>
+          <text x="${x + 43.5}" y="${y + 43}" fill="#202526" font-size="22" font-weight="800" text-anchor="middle">${label}</text>
+        </g>`;
+      const restrooms = floorOne
+        ? `${restroomSvg(310, 200, 'M')}${restroomSvg(310, 291, 'W')}`
+        : `${restroomSvg(310, 213, 'M')}${restroomSvg(310, 288, 'W')}`;
+      const mapWidth = floorOne ? 850 : 843;
+      const mapHeight = floorOne ? 719 : 715;
+      const corridorX = floorOne ? 420 : 402;
 
       mapFrame.innerHTML = `
-        <svg viewBox="${minX} ${minY} ${viewBoxWidth} ${viewBoxHeight}" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="hallwayGrad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stop-color="#0f1922"/>
-              <stop offset="50%" stop-color="#192836"/>
-              <stop offset="100%" stop-color="#0f1922"/>
-            </linearGradient>
-          </defs>
-
-          <!-- Outer boundary -->
-          <rect x="20" y="12" width="420" height="142" rx="10" fill="#0b1319" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
-
-          <!-- Hallway Corridor -->
-          <rect x="30" y="82" width="400" height="20" rx="4" fill="url(#hallwayGrad)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-          <text x="230" y="95" fill="rgba(255,255,255,0.3)" font-size="8" font-weight="800" text-anchor="middle" letter-spacing="1">CENTRAL CORRIDOR</text>
-
-          <!-- Animated Walking Route to Selected Room -->
-          ${activeItem && activeItem.path ? `
-            <path d="${activeItem.path}" fill="none" stroke="#ffb600" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="walking-route-path"/>
-          ` : ''}
-
-          <!-- Room Nodes -->
-          ${floorRooms.map(r => `
-            <g class="map-room-node ${r.room === (activeItem ? activeItem.room : '') ? 'highlighted' : ''}" data-room="${r.room}">
-              <rect class="map-room-rect" x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" rx="6"
-                    fill="rgba(0, 79, 110, 0.75)" stroke="#004f6e" stroke-width="1.5" />
-              <text x="${r.x + r.w / 2}" y="${r.y + r.h / 2 - 2}" fill="#FFFFFF" font-size="10" font-weight="800" text-anchor="middle">${r.room}</text>
-              <text x="${r.x + r.w / 2}" y="${r.y + r.h / 2 + 10}" fill="#ffb600" font-size="7" font-weight="700" text-anchor="middle">${r.catLabel}</text>
-            </g>
-          `).join('')}
-
-          <!-- Kiosk "You Are Here" Marker -->
-          <circle cx="45" cy="130" r="8" fill="#10B981" opacity="0.3"/>
-          <circle cx="45" cy="130" r="5" fill="#10B981"/>
-          <circle cx="45" cy="130" r="2" fill="#FFFFFF"/>
-          <text x="45" y="148" fill="#10B981" font-size="7" font-weight="800" text-anchor="middle">KIOSK</text>
+        <svg viewBox="${minX} ${minY} ${viewWidth} ${viewHeight}" xmlns="http://www.w3.org/2000/svg" aria-label="Ka Lama Floor ${state.activeFloor} map">
+          <rect width="${mapWidth}" height="${mapHeight}" fill="#575858"/>
+          <rect x="10" y="10" width="${floorOne ? 410 : 393}" height="${floorOne ? 187 : 201}" fill="#fffdf8" stroke="#202526" stroke-width="4"/>
+          <text x="35" y="${floorOne ? 120 : 135}" fill="#303234" font-size="78" font-weight="800">FLOOR ${state.activeFloor}</text>
+          <rect x="${corridorX}" y="10" width="52" height="${mapHeight - 20}" fill="#686a6b"/>
+          ${roomSvg}
+          ${restrooms}
+          ${stairs}
+          <rect x="${floorOne ? 450 : 445}" y="${floorOne ? 352 : 342}" width="55" height="53" rx="3" fill="#f27ad6" stroke="#202526" stroke-width="3"/>
+          <text x="${floorOne ? 477 : 472}" y="${floorOne ? 387 : 377}" fill="#202526" font-size="22" font-weight="800" text-anchor="middle">E</text>
+          <rect x="${floorOne ? 450 : 445}" y="${floorOne ? 412 : 405}" width="55" height="112" rx="3" fill="#5bd4f5" stroke="#202526" stroke-width="3"/>
+          <path d="M${floorOne ? 477 : 472} ${floorOne ? 432 : 425}v72m-20-56h14m-14 17h14m-14 17h14m12-34h14m-14 17h14m-14 17h14" stroke="#202526" stroke-width="5"/>
         </svg>
       `;
 
-      // Map room node clicks
-      mapFrame.querySelectorAll('.map-room-node').forEach(node => {
-        node.addEventListener('click', () => {
-          const rm = node.getAttribute('data-room');
-          selectRoom(rm);
-        });
+      mapFrame.querySelectorAll('.map-room-node[data-room]').forEach(node => {
+        node.addEventListener('click', () => selectRoom(node.getAttribute('data-room')));
       });
     }
 
@@ -776,16 +890,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Default select first room on that floor
         const first = directoryData.find(r => r.floor === state.activeFloor);
         if (first) state.selectedRoom = first.room;
-        render();
-      });
-    });
-
-    // Category chip clicks
-    catChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        catChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        state.activeCategory = chip.getAttribute('data-cat');
         render();
       });
     });
