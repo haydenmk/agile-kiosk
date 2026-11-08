@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     idleSecondsRemaining: 60,
     idleThreshold: 60,
     isIdle: true,
+    adminOpen: false,
+    customPageId: null,
     mapZoom: 1,
     surveyVotes: {
       "Food Trucks & Social Events": 54,
@@ -221,8 +223,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Contacts (names + emails) come from the editable content store (section 13).
+  function getRoomContacts(room) {
+    return contactsByRoom[room.room] || [];
+  }
+
   function getRoomContact(room) {
-    return spreadsheetContacts[room.room] || [];
+    return getRoomContacts(room).map(contact => contact.name);
+  }
+
+  function getRoomSubtitle(room) {
+    const contacts = getRoomContacts(room);
+    if (contacts.length === 0) return room.desc;
+    const emails = contacts.map(contact => contact.email).filter(Boolean);
+    return [`Room ${room.room.replace('KL-', '')}`, ...emails].join(' · ');
   }
 
   function getRoomDisplayName(room) {
@@ -231,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- MOCK DATA: ACADEMIC PROGRAMS ---
-  const programsData = {
+  const defaultPrograms = {
     business: {
       title: "Business Administration",
       tagline: "Empowering island business leaders, entrepreneurs, and managers.",
@@ -363,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   // --- MOCK DATA: EVENTS ---
-  const eventsData = [
+  const defaultEvents = [
     {
       filter: "week",
       mon: "OCT",
@@ -469,8 +483,82 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   ];
 
+  // --- EDITABLE CONTENT -----------------------------------------------------
+  // Everything below is the DEFAULT content. Edits made in the admin panel are
+  // saved in this browser (see content-store.js) and loaded on top of it.
+  const defaultContacts = Object.entries(spreadsheetContacts).flatMap(([room, names]) =>
+    names.map(name => ({ room, name, email: '' }))
+  );
+
+  const defaultContent = {
+    flyers: [
+      { badge: "Featured Program", title: "Applied Business & Info Tech (ABIT)", lead: "Island tech starts here.", tag1: "4-Year Bachelor Degree", tag2: "100% On Maui", theme: "ocean" },
+      { badge: "Hospitality & Tourism", title: "Lead Maui's Premier Resorts & Tourism", lead: "Lead Maui's next great guest experience.", tag1: "Guaranteed Internships", tag2: "Direct Career Track", theme: "navy" },
+      { badge: "Student Event", title: "Fall Business Capstone & Pitch Day", lead: "Nov 12 · Ka Lama 102", tag1: "Ka Lama 102", tag2: "Free Refreshments", theme: "copper" },
+      { badge: "Career Opportunity", title: "Student Help & Lab Assistant Positions", lead: "Flexible campus work while you study.", tag1: "$16.50/hr", tag2: "Apply at Ka Lama 203", theme: "slate" },
+      { badge: "Advising & Registration", title: "Spring 2027 Registration Starts Soon", lead: "Spring 2027 planning starts soon.", tag1: "Walk-ins Welcome", tag2: "Ka Lama 2nd Floor", theme: "lagoon" }
+    ],
+    today: [
+      { time: "9:00 AM", title: "BUS 120: Principles of Management", sub: "Ka Lama 101 Lecture Hall" },
+      { time: "11:30 AM", title: "HOST Industry Guest Speaker & Lunch", sub: "Ka Lama 102 Active Learning Lab" },
+      { time: "2:00 PM", title: "ABIT Open Cyber Lab & Mentoring", sub: "Ka Lama 202 Technology Hub" }
+    ],
+    ticker: [
+      "UHMC Spring 2027 Registration opens Dec 1",
+      "Ka Lama 201 Open Computer Lab hours: Mon–Fri 8:00 AM – 5:00 PM",
+      "Free VITA Volunteer Tax Preparation starting next month",
+      "Maui County Internship stipend applications now open",
+      "Ka Lama Advising Office walk-ins available daily on 2nd floor"
+    ],
+    banner: {
+      badge: "FEATURED ANNOUNCEMENT",
+      title: "Spring 2027 Registration & Academic Advising Now Open",
+      body: "Plan your degree pathways with Ka Lama business faculty. Stop by 2nd Floor offices or schedule via STAR GPS."
+    },
+    menuBannerVisible: true,
+    featuredEvent: {
+      artBadge: "FEATURED EVENT FLYER",
+      artTitle: "ABIT Senior Capstone & Venture Pitch Showcase",
+      artText: "Maui tech, software & business startup presentations by UHMC graduates.",
+      tag: "Academic & Tech",
+      title: "Annual Business Pitch & Tech Demo Day",
+      date: "Friday, Nov 12",
+      time: "1:00 PM – 4:00 PM",
+      location: "Ka Lama Rm 102",
+      summary: "Join our community of Maui mentors, entrepreneurs, and students. Refreshments served. Open to all students, alumni, and local business leaders."
+    },
+    events: defaultEvents,
+    programs: defaultPrograms,
+    contacts: defaultContacts,
+    menuTiles: [
+      { id: "programs", type: "view", view: "view-programs", title: "Business Programs", subtitle: "Business · Hospitality · Accounting · ABIT", icon: "book", body: "", hidden: false },
+      { id: "directory", type: "view", view: "view-directory", title: "Building Directory", subtitle: "Rooms and offices, floors 1–2", icon: "layout", body: "", hidden: false },
+      { id: "jobs", type: "view", view: "view-jobs", title: "Job Opportunities", subtitle: "Business jobs and internships", icon: "briefcase", body: "", hidden: false },
+      { id: "events", type: "view", view: "view-events", title: "Events & News", subtitle: "Events, marketing, special occasions", icon: "calendar", body: "", hidden: false },
+      { id: "survey", type: "view", view: "view-survey", title: "Student Survey", subtitle: "Share your ideas for campus", icon: "clipboard", body: "", hidden: false },
+      { id: "website", type: "view", view: "view-website", title: "UHMC Website", subtitle: "Browse maui.hawaii.edu", icon: "globe", body: "", hidden: false }
+    ],
+    attractWidgets: [
+      { id: "slideshow", visible: true },
+      { id: "today", visible: true },
+      { id: "job", visible: true },
+      { id: "ticker", visible: true }
+    ],
+    meta: { updatedBy: "", updatedAt: "" }
+  };
+
+  // Live content (defaults + saved admin edits). The module renderers below read
+  // these variables each time they draw, so applyContent() can swap them out.
+  let content = KioskStore.load(defaultContent);
+  let eventsData = content.events;
+  let programsData = content.programs;
+  let contactsByRoom = buildContactsByRoom(content.contacts);
+  let slideIndex = 0;
+  const rerenderHooks = []; // each module registers its render() here
+
   // --- INITIALIZE ALL MODULES ---
   initClock();
+  renderContentWidgets();
   initNavigation();
   initIdleTimer();
   initAttractSlideshow();
@@ -515,13 +603,20 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Main Menu Tiles
-    document.querySelectorAll('.menu-tile').forEach(tile => {
-      tile.addEventListener('click', () => {
+    // Main Menu Tiles (delegated, because the admin can add/remove/reorder tiles)
+    const menuGrid = document.querySelector('.menu-grid-2x3');
+    if (menuGrid) {
+      menuGrid.addEventListener('click', event => {
+        const tile = event.target.closest('.menu-tile');
+        if (!tile) return;
         const targetView = tile.getAttribute('data-view');
+        if (targetView === 'view-custom') {
+          state.customPageId = tile.getAttribute('data-tile-id');
+          renderCustomPage();
+        }
         switchView(targetView);
       });
-    });
+    }
 
     // Featured Announcement Banner on Menu
     const featBanner = document.querySelector('.featured-banner-card');
@@ -627,6 +722,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (footerIdleHint) footerIdleHint.style.display = 'none';
         state.isIdle = false;
         break;
+
+      case 'view-custom': {
+        // Info pages created by the admin from the Layout tab
+        const customTile = content.menuTiles.find(t => t.id === state.customPageId);
+        appEl.classList.remove('at-attract');
+        screenHeading.textContent = customTile ? customTile.title : "Information";
+        if (btnMainMenu) btnMainMenu.style.display = 'block';
+        if (footerIdleHint) footerIdleHint.style.display = 'none';
+        state.isIdle = false;
+        break;
+      }
     }
 
     resetIdleTimer();
@@ -646,7 +752,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     setInterval(() => {
-      if (!state.isIdle) {
+      // The idle countdown pauses while an admin is signed in
+      if (!state.isIdle && !state.adminOpen) {
         state.idleSecondsRemaining--;
         if (idleSecsEl) {
           idleSecsEl.textContent = Math.max(0, state.idleSecondsRemaining);
@@ -676,20 +783,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // 4. PAGE 1: ATTRACT SLIDESHOW (Portrait Flyers)
   // =========================================================================
   function initAttractSlideshow() {
-    const slides = document.querySelectorAll('.flyer-slide');
-    const dots = document.querySelectorAll('#slideshow-dots .dot');
-    let currentIndex = 0;
-
-    if (slides.length === 0) return;
-
+    // Slides are rendered from the editable content (renderFlyers), so look
+    // them up fresh on every tick.
     setInterval(() => {
-      slides[currentIndex].classList.remove('active');
-      dots[currentIndex].classList.remove('active');
+      const slides = document.querySelectorAll('#attract-slideshow .flyer-slide');
+      const dots = document.querySelectorAll('#slideshow-dots .dot');
+      if (slides.length < 2) return;
 
-      currentIndex = (currentIndex + 1) % slides.length;
+      const current = slideIndex % slides.length;
+      slides[current].classList.remove('active');
+      if (dots[current]) dots[current].classList.remove('active');
 
-      slides[currentIndex].classList.add('active');
-      dots[currentIndex].classList.add('active');
+      slideIndex = (current + 1) % slides.length;
+
+      slides[slideIndex].classList.add('active');
+      if (dots[slideIndex]) dots[slideIndex].classList.add('active');
     }, 4500);
   }
 
@@ -716,7 +824,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const filtered = floorRooms.filter(r => {
         const matchesCat = state.activeCategory === 'all' || r.category === state.activeCategory;
-        const contactText = getRoomContact(r).join(' ');
+        const contactText = getRoomContacts(r).map(c => `${c.name} ${c.email}`).join(' ');
         const matchesQuery = !query ||
           r.room.toLowerCase().includes(query) ||
           r.name.toLowerCase().includes(query) ||
@@ -734,12 +842,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       } else {
         listContainer.innerHTML = filtered.map(item => `
-          <div class="dir-row-item ${item.room === state.selectedRoom ? 'selected' : ''}" data-room="${item.room}">
+          <div class="dir-row-item ${item.room === state.selectedRoom ? 'selected' : ''}" data-room="${esc(item.room)}">
             <div class="dir-row-left">
-              <span class="dir-room-tag">${item.room}</span>
+              <span class="dir-room-tag">${esc(item.room)}</span>
               <div>
-                <div class="dir-name-title">${getRoomDisplayName(item)}</div>
-                <div class="dir-cat-sub">${getRoomContact(item).length ? `Room ${item.room.replace('KL-', '')}` : item.desc}</div>
+                <div class="dir-name-title">${esc(getRoomDisplayName(item))}</div>
+                <div class="dir-cat-sub">${esc(getRoomSubtitle(item))}</div>
               </div>
             </div>
             <span class="dir-chevron">›</span>
@@ -912,6 +1020,7 @@ document.addEventListener('DOMContentLoaded', () => {
       render();
     });
 
+    rerenderHooks.push(render);
     render();
   }
 
@@ -940,12 +1049,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       degreesListEl.innerHTML = prog.degrees.map(d => `
         <div class="degree-item">
-          <strong>[${d.code}]</strong> · ${d.name}
+          <strong>[${esc(d.code)}]</strong> · ${esc(d.name)}
         </div>
       `).join('');
 
       careersListEl.innerHTML = prog.careers.map(c => `
-        <span class="career-chip">${c}</span>
+        <span class="career-chip">${esc(c)}</span>
       `).join('');
     }
 
@@ -959,6 +1068,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    rerenderHooks.push(() => renderProgram(state.selectedProgram));
     renderProgram('business');
   }
 
@@ -1082,15 +1192,21 @@ document.addEventListener('DOMContentLoaded', () => {
       cardsList.innerHTML = filtered.map(ev => `
         <div class="event-card-item">
           <div class="event-date-col">
-            <span class="event-date-month">${ev.mon}</span>
-            <span class="event-date-day">${ev.day}</span>
+            <span class="event-date-month">${esc(ev.mon)}</span>
+            <span class="event-date-day">${esc(ev.day)}</span>
           </div>
           <div class="event-item-info">
-            <div class="event-item-title">${ev.title}</div>
-            <div class="event-item-sub">🕒 ${ev.time} · 📍 ${ev.location}</div>
+            <div class="event-item-title">${esc(ev.title)}</div>
+            <div class="event-item-sub">🕒 ${esc(ev.time)} · 📍 ${esc(ev.location)}</div>
           </div>
         </div>
-      `).join('');
+      `).join('') || `
+        <div class="event-card-item">
+          <div class="event-item-info">
+            <div class="event-item-sub">No events listed here right now. Check back soon!</div>
+          </div>
+        </div>
+      `;
     }
 
     timeTabs.forEach(tab => {
@@ -1102,6 +1218,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    rerenderHooks.push(renderEvents);
     renderEvents();
   }
 
@@ -1410,4 +1527,199 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   }
+
+  // =========================================================================
+  // 13. EDITABLE CONTENT (flyers, ticker, layout...) + ADMIN PANEL HOOKS
+  // =========================================================================
+  function esc(value) {
+    return String(value === null || value === undefined ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function buildContactsByRoom(contacts) {
+    const map = {};
+    contacts.forEach(contact => {
+      if (!map[contact.room]) map[contact.room] = [];
+      map[contact.room].push(contact);
+    });
+    return map;
+  }
+
+  function renderContentWidgets() {
+    renderFlyers();
+    renderToday();
+    renderTicker();
+    renderMenuBanner();
+    renderFeaturedEvent();
+    renderMenuTiles();
+    applyAttractLayout();
+    if (state.currentView === 'view-custom') renderCustomPage();
+  }
+
+  function renderFlyers() {
+    const track = document.getElementById('attract-slideshow');
+    const dots = document.getElementById('slideshow-dots');
+    if (!track || !dots) return;
+
+    slideIndex = 0;
+    track.innerHTML = content.flyers.map((flyer, i) => {
+      const theme = KioskStore.FLYER_THEMES[flyer.theme] || KioskStore.FLYER_THEMES.ocean;
+      const tags = [flyer.tag1, flyer.tag2]
+        .filter(Boolean)
+        .map(tag => `<span class="tag-gold">${esc(tag)}</span>`)
+        .join('');
+      return `
+        <div class="flyer-slide ${i === 0 ? 'active' : ''}" style="--flyer-bg: ${theme.css};">
+          <div class="flyer-overlay"></div>
+          <div class="flyer-badge">${esc(flyer.badge)}</div>
+          <div class="flyer-body">
+            <h2>${esc(flyer.title)}</h2>
+            <p class="flyer-lead">${esc(flyer.lead)}</p>
+            <div class="flyer-meta-row">${tags}</div>
+          </div>
+        </div>`;
+    }).join('');
+    dots.innerHTML = content.flyers.map((_, i) => `<span class="dot ${i === 0 ? 'active' : ''}"></span>`).join('');
+  }
+
+  function renderToday() {
+    const list = document.querySelector('.today-list');
+    if (!list) return;
+    list.innerHTML = content.today.map(item => `
+      <div class="today-item">
+        <div class="time-pill">${esc(item.time)}</div>
+        <div class="today-details">
+          <span class="item-title">${esc(item.title)}</span>
+          <span class="item-sub">${esc(item.sub)}</span>
+        </div>
+      </div>
+    `).join('') || `
+      <div class="today-item">
+        <div class="today-details">
+          <span class="item-sub">Nothing scheduled right now.</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderTicker() {
+    const track = document.querySelector('.ticker-track');
+    if (!track) return;
+    track.innerHTML = content.ticker
+      .map((message, i) => `${i ? '<span class="bullet">•</span>' : ''}<span>${esc(message)}</span>`)
+      .join('');
+    // Keep the scroll speed steady no matter how much text there is
+    const characters = content.ticker.join(' ').length;
+    track.style.animationDuration = `${Math.max(20, Math.round(characters * 0.28))}s`;
+  }
+
+  function renderMenuBanner() {
+    const banner = document.querySelector('.featured-banner-card');
+    if (!banner) return;
+    banner.style.display = content.menuBannerVisible ? '' : 'none';
+    document.getElementById('banner-badge-text').textContent = content.banner.badge;
+    document.getElementById('banner-title').textContent = content.banner.title;
+    document.getElementById('banner-body').textContent = content.banner.body;
+  }
+
+  function renderFeaturedEvent() {
+    const fe = content.featuredEvent;
+    const set = (id, text) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    };
+    set('feat-art-badge', fe.artBadge);
+    set('feat-art-title', fe.artTitle);
+    set('feat-art-text', fe.artText);
+    set('feat-tag', fe.tag);
+    set('feat-title', fe.title);
+    set('feat-date', `📅 ${fe.date}`);
+    set('feat-time', `⏰ ${fe.time}`);
+    set('feat-location', `📍 ${fe.location}`);
+    set('feat-summary', fe.summary);
+  }
+
+  function renderMenuTiles() {
+    const grid = document.querySelector('.menu-grid-2x3');
+    if (!grid) return;
+    grid.innerHTML = content.menuTiles
+      .filter(tile => !tile.hidden)
+      .map(tile => `
+        <button class="menu-tile menu-tile-${esc(tile.id)}" data-view="${esc(tile.view)}" data-tile-id="${esc(tile.id)}">
+          <div class="tile-icon-circle">${KioskStore.iconSvg(tile.icon, 34)}</div>
+          <div class="tile-text">
+            <h3>${esc(tile.title)}</h3>
+            <p>${esc(tile.subtitle)}</p>
+          </div>
+        </button>
+      `).join('');
+  }
+
+  function renderCustomPage() {
+    const tile = content.menuTiles.find(t => t.id === state.customPageId);
+    const titleEl = document.getElementById('custom-page-title');
+    const bodyEl = document.getElementById('custom-page-body');
+    if (!tile || !titleEl || !bodyEl) return;
+    titleEl.textContent = tile.title;
+    bodyEl.innerHTML = esc(tile.body)
+      .split(/\n{2,}/)
+      .filter(Boolean)
+      .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
+      .join('');
+  }
+
+  function applyAttractLayout() {
+    const selectors = {
+      slideshow: '.slideshow-card',
+      today: '.today-card',
+      job: '.featured-job-card',
+      ticker: '.news-ticker-bar'
+    };
+    content.attractWidgets.forEach((widget, index) => {
+      const el = document.querySelector(selectors[widget.id]);
+      if (!el) return;
+      el.style.order = index;
+      el.style.display = widget.visible ? '' : 'none';
+    });
+    const touchBanner = document.querySelector('.touch-begin-banner');
+    if (touchBanner) touchBanner.style.order = 99; // always last
+  }
+
+  // Swap in new content, redraw every screen, and save it in this browser.
+  // Returns true when the browser accepted the save.
+  function applyContent(newContent, persist) {
+    content = KioskStore.sanitize(newContent, defaultContent);
+    eventsData = content.events;
+    programsData = content.programs;
+    contactsByRoom = buildContactsByRoom(content.contacts);
+    renderContentWidgets();
+    rerenderHooks.forEach(fn => fn());
+    return persist === false ? true : KioskStore.save(content);
+  }
+
+  // The admin panel (admin.js) talks to the kiosk only through this object.
+  window.KioskApp = {
+    getContent: () => KioskStore.clone(content),
+    getDefaults: () => KioskStore.clone(defaultContent),
+    getRooms: () => directoryData
+      .map(room => ({ room: room.room, floor: room.floor }))
+      .sort((a, b) => a.floor - b.floor || a.room.localeCompare(b.room, undefined, { numeric: true })),
+    applyContent,
+    resetToDefaults() {
+      KioskStore.reset();
+      applyContent(KioskStore.clone(defaultContent), false);
+    },
+    setAdminOpen(open) {
+      state.adminOpen = !!open;
+      resetIdleTimer();
+    },
+    goToMenu() {
+      wakeFromAttract();
+      switchView('view-menu');
+    }
+  };
 });
