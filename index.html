@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>UHMC Business Department — Ka Lama Interactive Kiosk</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin.css">
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -248,10 +249,10 @@
 
             <!-- Featured Promo Banner (Display only, out of easy reach) -->
             <div class="featured-banner-card" data-action="view-events">
-              <div class="banner-badge">FEATURED ANNOUNCEMENT</div>
+              <div class="banner-badge" id="banner-badge-text">FEATURED ANNOUNCEMENT</div>
               <div class="banner-content">
-                <h3>Spring 2027 Registration &amp; Academic Advising Now Open</h3>
-                <p>Plan your degree pathways with Ka Lama business faculty. Stop by 2nd Floor offices or schedule via STAR GPS.</p>
+                <h3 id="banner-title">Spring 2027 Registration &amp; Academic Advising Now Open</h3>
+                <p id="banner-body">Plan your degree pathways with Ka Lama business faculty. Stop by 2nd Floor offices or schedule via STAR GPS.</p>
               </div>
               <div class="banner-action-indicator">
                 <span>View Details →</span>
@@ -548,24 +549,24 @@
             <div class="featured-event-hero">
               <div class="event-flyer-art">
                 <div class="flyer-art-content">
-                  <span class="art-badge">FEATURED EVENT FLYER</span>
-                  <h3>ABIT Senior Capstone &amp; Venture Pitch Showcase</h3>
-                  <p>Maui tech, software &amp; business startup presentations by UHMC graduates.</p>
+                  <span class="art-badge" id="feat-art-badge">FEATURED EVENT FLYER</span>
+                  <h3 id="feat-art-title">ABIT Senior Capstone &amp; Venture Pitch Showcase</h3>
+                  <p id="feat-art-text">Maui tech, software &amp; business startup presentations by UHMC graduates.</p>
                 </div>
               </div>
 
               <div class="featured-event-content">
                 <div class="event-tags-row">
                   <span class="tag-featured">FEATURED</span>
-                  <span class="tag-cat">Academic &amp; Tech</span>
+                  <span class="tag-cat" id="feat-tag">Academic &amp; Tech</span>
                 </div>
-                <h2 class="featured-event-title">Annual Business Pitch &amp; Tech Demo Day</h2>
+                <h2 class="featured-event-title" id="feat-title">Annual Business Pitch &amp; Tech Demo Day</h2>
                 <div class="featured-event-loc">
-                  <span class="loc-item">📅 Friday, Nov 12</span>
-                  <span class="loc-item">⏰ 1:00 PM – 4:00 PM</span>
-                  <span class="loc-item">📍 Ka Lama Rm 102</span>
+                  <span class="loc-item" id="feat-date">📅 Friday, Nov 12</span>
+                  <span class="loc-item" id="feat-time">⏰ 1:00 PM – 4:00 PM</span>
+                  <span class="loc-item" id="feat-location">📍 Ka Lama Rm 102</span>
                 </div>
-                <p class="featured-event-summary">
+                <p class="featured-event-summary" id="feat-summary">
                   Join our community of Maui mentors, entrepreneurs, and students. Refreshments served. Open to all students, alumni, and local business leaders.
                 </p>
 
@@ -783,6 +784,16 @@
           </div>
         </section>
 
+        <!-- ---------------------------------------------------------------
+             CUSTOM INFO PAGE (created by an admin from the Layout tab)
+             --------------------------------------------------------------- -->
+        <section id="view-custom" class="view-panel">
+          <div class="custom-page-card">
+            <h2 id="custom-page-title">Information</h2>
+            <div id="custom-page-body" class="custom-page-body"></div>
+          </div>
+        </section>
+
       </div> <!-- /kiosk-body -->
 
       <!-- ===================================================================
@@ -917,6 +928,10 @@
     </div> <!-- /kiosk-app -->
   </div> <!-- /kiosk-viewport -->
 
+  <script src="content-store.js"></script>
   <script src="app.js"></script>
+  <!-- Admin panel: approved-emails.js is the list of people who may sign in -->
+  <script src="approved-emails.js"></script>
+  <script src="admin.js"></script>
 </body>
 </html>

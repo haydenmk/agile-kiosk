@@ -21,6 +21,42 @@ Built in exact accordance with the 8-screen wireframe specifications in [`UHMC K
 
 ---
 
+## 🛠️ Admin Panel (edit the kiosk without touching code)
+
+Staff can update kiosk content right on the touchscreen.
+
+**Open it:** press and hold the **UHMC** badge in the top-left corner for about 1.5 seconds (on a desktop you can also press `Ctrl + Shift + A`).
+
+**Sign in:** type your approved email address and the shared admin password (an on-screen keyboard is built in). The approved emails and the password both live in [`approved-emails.js`](approved-emails.js). To add or remove people or change the password, edit that file on GitHub and commit, then refresh the kiosk. Emails are not case-sensitive; the password is. After 5 wrong attempts, sign-in locks for 60 seconds.
+
+| Tab | What you can edit |
+| :--- | :--- |
+| **Events** | Main Menu announcement banner, the featured event card, and the This Week / This Month / Special Occasions event list |
+| **Flyers** | Attract-screen flyer slideshow (add, remove, reorder, change colors) |
+| **News bar** | The scrolling text at the bottom of the attract screen |
+| **Classes** | "Today in Ka Lama" schedule, plus each program's description, degrees and career paths |
+| **People** | Program advisor names/emails and directory contacts (name + email per room) |
+| **Layout** | Add, remove, hide and reorder Main Menu tiles (including custom info pages), and show/hide/reorder attract-screen cards |
+| **Backup** | Download / restore a backup file, or reset to defaults |
+
+Changes appear on the kiosk immediately. The panel signs itself out after 5 minutes without a touch.
+
+### Where edits are saved (important)
+
+There is no server, so edits are stored in **that kiosk browser's local storage**. They survive reloads, restarts and power cycles on the same device and browser profile. They are lost if the browser's site data is cleared, if it runs in private/incognito mode, or if you open the kiosk in a different browser or on another computer. Edits are **not** written back to GitHub, so use **Backup → Download backup file** after big changes.
+
+### Security note
+
+The sign-in check runs in the browser, so it keeps casual users away from the admin panel but is **not strong security** (someone with browser developer tools could bypass it). This repository is public, so the emails **and the password** in `approved-emails.js` are visible to anyone who looks. Don't use this panel to protect sensitive data.
+
+### Admin files
+
+- `content-store.js`: saves/loads edits and validates data
+- `admin.js` / `admin.css`: the admin panel itself
+- `approved-emails.js`: who may sign in, and the admin password (edit through GitHub)
+
+---
+
 ## 🚀 How to Run Locally
 
 Because this prototype is built with standard web technologies (HTML5, CSS3, JavaScript), there are no complex build steps required:
