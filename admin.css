@@ -95,6 +95,16 @@
   margin-bottom: 6px;
 }
 
+.adm-pw-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.adm-login .adm-field + .adm-field {
+  margin-top: 10px;
+}
+
 .adm-login-actions {
   display: flex;
   gap: 10px;

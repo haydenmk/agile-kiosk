@@ -5,9 +5,10 @@
  * top-left corner for about 1.5 seconds. (On a desktop you can also press
  * Ctrl + Shift + A.)
  *
- * Sign-in: staff type their email address. Only addresses listed in
- * approved-emails.js (edited through GitHub) are let in. This check runs in the
- * browser, so it keeps casual users out but is NOT strong security.
+ * Sign-in: staff type their email address and the shared admin password. The
+ * email must be listed in approved-emails.js (edited through GitHub), which also
+ * holds the password. This check runs in the browser, so it keeps casual users
+ * out but is NOT strong security.
  *
  * Edits are applied to the kiosk immediately and saved in this browser's
  * localStorage (see content-store.js). The panel only talks to the kiosk through
@@ -50,7 +51,7 @@
 
   // ------------------------------------------------------------------ state
   let overlay, loginBox, panelBox, panelHeader, tabBar, bodyEl, statusEl, kbdDock, kbdToggleBtn;
-  let emailInput, loginErrorEl;
+  let emailInput, passwordInput, loginErrorEl;
   let session = null;          // { email } while someone is signed in
   let draft = null;            // working copy of the content being edited
   let activeTab = 'events';
@@ -670,7 +671,7 @@
   // keyboard is showing we ask the browser not to open its keyboard.
   function applyInputMode() {
     if (!overlay) return;
-    overlay.querySelectorAll('input[type="text"], textarea').forEach(el => {
+    overlay.querySelectorAll('input[type="text"], input[type="password"], textarea').forEach(el => {
       el.setAttribute('inputmode', kbdVisible ? 'none' : 'text');
     });
   }
@@ -684,6 +685,10 @@
       .filter(email => email && !email.endsWith('@example.com'));
   }
 
+  function adminPassword() {
+    return typeof window.KIOSK_ADMIN_PASSWORD === 'string' ? window.KIOSK_ADMIN_PASSWORD : '';
+  }
+
   function showLoginError(message) {
     loginErrorEl.textContent = message;
   }
@@ -695,8 +700,9 @@
       return;
     }
     const approved = approvedEmails();
-    if (approved.length === 0) {
-      showLoginError('No approved emails are set up yet. Add yours to approved-emails.js in the GitHub repo.');
+    const password = adminPassword();
+    if (approved.length === 0 || !password) {
+      showLoginError('Admin sign-in is not set up yet. Add emails and a password to approved-emails.js in the GitHub repo.');
       return;
     }
     const email = emailInput.value.trim().toLowerCase();
@@ -704,19 +710,26 @@
       showLoginError('Please enter a valid email address.');
       return;
     }
-    if (!approved.includes(email)) {
+    if (!passwordInput.value) {
+      showLoginError('Please enter the admin password.');
+      return;
+    }
+    // Same message for a wrong email or a wrong password, so neither is revealed
+    if (!approved.includes(email) || passwordInput.value !== password) {
       failedLogins++;
+      passwordInput.value = '';
       if (failedLogins >= MAX_FAILED_LOGINS) {
         failedLogins = 0;
         lockedUntil = now + LOCKOUT_MS;
         showLoginError('Too many attempts. Locked for 60 seconds.');
       } else {
-        showLoginError("That email isn't on the approved list.");
+        showLoginError('Email or password is incorrect.');
       }
       return;
     }
 
     failedLogins = 0;
+    passwordInput.value = '';
     session = { email };
     draft = window.KioskApp.getContent();
     activeTab = 'events';
@@ -733,6 +746,8 @@
     panelBox.hidden = true;
     loginBox.hidden = false;
     emailInput.value = '';
+    passwordInput.value = '';
+    passwordInput.type = 'password';
     showLoginError('');
     applyInputMode();
     setTimeout(() => emailInput.focus({ preventScroll: true }), 50);
@@ -775,15 +790,36 @@
     emailInput.setAttribute('autocomplete', 'off');
     emailInput.setAttribute('autocapitalize', 'none');
     emailInput.setAttribute('spellcheck', 'false');
+    passwordInput = h('input', { class: 'adm-input big', type: 'password', placeholder: 'Admin password', id: 'adm-password' });
+    passwordInput.setAttribute('autocomplete', 'off');
+    passwordInput.setAttribute('autocapitalize', 'none');
+    passwordInput.setAttribute('spellcheck', 'false');
+    // Enter on the email moves to the password; Enter on the password signs in
     emailInput.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      if (passwordInput.value) attemptLogin();
+      else passwordInput.focus({ preventScroll: true });
+    });
+    passwordInput.addEventListener('keydown', e => {
       if (e.key === 'Enter') attemptLogin();
+    });
+    const showPasswordBtn = h('button', { type: 'button', class: 'adm-btn small ghost', text: 'Show', 'aria-pressed': 'false' });
+    showPasswordBtn.addEventListener('mousedown', e => e.preventDefault());
+    showPasswordBtn.addEventListener('click', () => {
+      const reveal = passwordInput.type === 'password';
+      passwordInput.type = reveal ? 'text' : 'password';
+      showPasswordBtn.textContent = reveal ? 'Hide' : 'Show';
+      showPasswordBtn.setAttribute('aria-pressed', String(reveal));
     });
     loginErrorEl = h('p', { class: 'adm-error', role: 'alert' });
 
     loginBox = h('div', { class: 'adm-login' },
       h('h2', { class: 'adm-title', text: 'Admin sign-in' }),
-      h('p', { class: 'adm-hint', text: 'Enter your approved staff email address.' }),
+      h('p', { class: 'adm-hint', text: 'Enter your approved staff email and the admin password.' }),
       h('label', { class: 'adm-field' }, h('span', { class: 'adm-label', text: 'Email' }), emailInput),
+      h('div', { class: 'adm-field' },
+        h('label', { class: 'adm-label', for: 'adm-password', text: 'Password' }),
+        h('div', { class: 'adm-pw-row' }, passwordInput, showPasswordBtn)),
       loginErrorEl,
       h('div', { class: 'adm-login-actions' },
         button('Cancel', () => closeAdmin(), 'ghost'),
@@ -799,7 +835,7 @@
       kbdDock);
 
     overlay.addEventListener('focusin', e => {
-      if (e.target.matches('input[type="text"], textarea')) lastField = e.target;
+      if (e.target.matches('input[type="text"], input[type="password"], textarea')) lastField = e.target;
     });
     ['pointerdown', 'keydown'].forEach(evt => overlay.addEventListener(evt, touchSession, true));
 

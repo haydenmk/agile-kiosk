@@ -1,19 +1,25 @@
 /**
- * APPROVED ADMIN EMAILS
+ * ADMIN SIGN-IN SETTINGS
  *
- * Only the email addresses listed here can sign in to the kiosk's admin panel.
- * Edit this list right here on GitHub (pencil icon > edit > commit), then
- * redeploy / refresh the kiosk.
+ * To sign in to the kiosk's admin panel, a person must type an email address
+ * from the list below AND the admin password. Edit this file right here on
+ * GitHub (pencil icon > edit > commit), then refresh the kiosk.
  *
- *  - One address per line, in quotes, separated by commas.
- *  - Capitalization doesn't matter.
- *  - Replace the example below with your real addresses.
+ *  - Emails: one per line, in quotes, separated by commas. Capitalization
+ *    doesn't matter.
+ *  - Password: capitalization DOES matter. Everyone shares this one password.
  *
- * NOTE: this repository is public, so anything listed here is visible to
- * anyone on the internet. Also, because the kiosk has no server, this check
- * runs in the browser: it keeps casual users out of the admin panel but is not
- * strong security. Don't treat it as protection for sensitive data.
+ * IMPORTANT: this repository is public, so the emails AND the password below
+ * can be read by anyone on the internet, and because the kiosk has no server
+ * the check runs in the browser. It keeps casual users out of the admin panel,
+ * but it is not strong security. Don't use it to protect sensitive data.
  */
 window.KIOSK_APPROVED_EMAILS = [
-  "admin@example.com"
+  "haydenmk@hawaii.edu",
+  "anpicana@hawaii.edu",
+  "toddhy@hawaii.edu",
+  "bgaoiran@hawaii.edu",
+  "vdoming@hawaii.edu"
 ];
+
+window.KIOSK_ADMIN_PASSWORD = "ICS418";
