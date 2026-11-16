@@ -137,6 +137,7 @@
     box.checked = o.invert ? !obj[key] : !!obj[key];
     box.addEventListener('change', () => {
       obj[key] = o.invert ? !box.checked : box.checked;
+      if (o.onChange) o.onChange(obj[key]);
       scheduleSave();
     });
     return h('label', { class: 'adm-check' }, box, h('span', { text: label }));
@@ -271,14 +272,6 @@
 
   // ------------------------------------------------------------------ tabs
   function eventsTab() {
-    const todayMonth = new Date().toLocaleString('en-US', { month: 'short' }).toUpperCase();
-    const todayDay = String(new Date().getDate()).padStart(2, '0');
-    const filterOptions = [
-      { value: 'week', label: 'This Week' },
-      { value: 'month', label: 'This Month' },
-      { value: 'special', label: 'Special Occasions' }
-    ];
-
     return h('div', null,
       section('Featured announcement', 'The gold banner at the top of the Main Menu.',
         checkField('Show this banner on the Main Menu', draft, 'menuBannerVisible'),
@@ -298,23 +291,196 @@
         textField('Location', draft.featuredEvent, 'location'),
         textField('Summary', draft.featuredEvent, 'summary', { multiline: true })),
 
-      section('Event list', 'Shown on the Events & News page, under This Week / This Month / Special Occasions.',
-        listEditor(draft.events, {
-          titleOf: ev => `${ev.mon} ${ev.day} · ${ev.title}`,
-          renderItem: (ev, i, refresh) => [
-            selectField('Show under', filterOptions, () => ev.filter, v => { ev.filter = v; }),
-            row(
-              textField('Month (e.g. NOV)', ev, 'mon', { onInput: refresh, grow: true }),
-              textField('Day', ev, 'day', { onInput: refresh, grow: true })),
-            textField('Event name', ev, 'title', { onInput: refresh }),
-            textField('Time', ev, 'time'),
-            textField('Location', ev, 'location')
-          ],
-          adds: [{
-            label: '+ Add event',
-            make: () => ({ filter: 'week', mon: todayMonth, day: todayDay, title: 'New event', time: '', location: '', desc: '' })
-          }]
+      calendarSection());
+  }
+
+  // ------------------------------------------------------- event calendar
+  const KS = () => window.KioskStore;
+  const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  let calMonth = null;     // { y, m } month being shown
+  let calSelected = null;  // "YYYY-MM-DD" day being edited
+  let calOpenId = null;    // id of the event card that is expanded
+
+  function resetCalendar() {
+    const today = KS().todayISO();
+    const p = KS().parseISO(today);
+    calMonth = { y: p.y, m: p.m };
+    calSelected = today;
+    calOpenId = null;
+  }
+
+  function rerenderKeepScroll() {
+    const top = bodyEl.scrollTop;
+    renderBody();
+    bodyEl.scrollTop = top;
+  }
+
+  function eventsOn(iso) {
+    return KS().sortEvents(draft.events.filter(ev => ev.date === iso));
+  }
+
+  function timeField(label, getVal, setVal, allowNone) {
+    const val = getVal();
+    const h12 = val ? (Number(val.slice(0, 2)) % 12 || 12) : '';
+    const min = val ? val.slice(3) : '';
+    const ap = val ? (Number(val.slice(0, 2)) < 12 ? 'AM' : 'PM') : '';
+    const hours = [];
+    for (let i = 1; i <= 12; i++) hours.push({ value: String(i), label: String(i) });
+    const mins = [];
+    for (let i = 0; i < 60; i += 5) mins.push({ value: String(i).padStart(2, '0'), label: String(i).padStart(2, '0') });
+    if (min && !mins.some(o => o.value === min)) mins.push({ value: min, label: min });
+    const none = allowNone ? [{ value: '', label: '—' }] : [];
+    const state = { h: String(h12), m: min, a: ap };
+    function commit() {
+      if (!state.h) { setVal(''); return; }
+      let hr = Number(state.h) % 12;
+      if ((state.a || 'AM') === 'PM') hr += 12;
+      setVal(`${String(hr).padStart(2, '0')}:${state.m || '00'}`);
+    }
+    const sel = (opts, key, empty) => {
+      const el = h('select', { class: 'adm-input' });
+      (empty ? none : []).concat(opts).forEach(o => el.append(h('option', { value: o.value, text: o.label })));
+      el.value = state[key] || (empty ? '' : opts[0].value);
+      el.addEventListener('change', () => {
+        state[key] = el.value;
+        if (key === 'h' && el.value) { state.m = state.m || '00'; state.a = state.a || 'AM'; }
+        commit();
+        rerenderKeepScroll();
+        scheduleSave();
+      });
+      return el;
+    };
+    return h('div', { class: 'adm-field grow' },
+      h('span', { class: 'adm-label', text: label }),
+      h('div', { class: 'adm-time-row' },
+        sel(hours, 'h', allowNone),
+        sel(mins, 'm', false),
+        sel([{ value: 'AM', label: 'AM' }, { value: 'PM', label: 'PM' }], 'a', false)));
+  }
+
+  function dateField(ev) {
+    const input = h('input', { class: 'adm-input', type: 'date' });
+    input.value = ev.date;
+    input.addEventListener('change', () => {
+      if (!KS().parseISO(input.value)) { input.value = ev.date; return; }
+      ev.date = input.value;
+      const p = KS().parseISO(ev.date);
+      calMonth = { y: p.y, m: p.m };
+      calSelected = ev.date;
+      scheduleSave();
+      rerenderKeepScroll();
+    });
+    return h('label', { class: 'adm-field grow' },
+      h('span', { class: 'adm-label', text: 'Date' }), input);
+  }
+
+  function eventCard(ev) {
+    const open = calOpenId === ev.id;
+    const when = KS().eventTimeText(ev) || 'No time set';
+    const head = h('div', { class: 'adm-card-head' },
+      h('div', { class: 'adm-card-title', text: `${when} · ${ev.title || '(untitled)'}` }),
+      h('div', { class: 'adm-card-actions' },
+        h('button', {
+          type: 'button', class: 'adm-icon-btn', text: open ? 'Done' : 'Edit',
+          onclick: () => { calOpenId = open ? null : ev.id; rerenderKeepScroll(); }
         })));
+    const card = h('div', { class: 'adm-card adm-event-card' }, head);
+    if (!open) return card;
+
+    const timeBlock = ev.allDay ? [] : [
+      row(
+        timeField('Starts', () => ev.start, v => { ev.start = v; if (ev.end && ev.end <= v) ev.end = ''; }, false),
+        timeField('Ends (optional)', () => ev.end, v => { ev.end = v && v > ev.start ? v : ''; }, true))
+    ];
+    card.append(h('div', { class: 'adm-card-body' },
+      textField('Event name', ev, 'title', { onInput: v => {
+        const t = card.querySelector('.adm-card-title');
+        if (t) t.textContent = `${when} · ${v || '(untitled)'}`;
+      } }),
+      textField('Event info', ev, 'info', { multiline: true, rows: 3 }),
+      row(dateField(ev)),
+      checkField('All day (no set time)', ev, 'allDay', { onChange: () => {
+        if (ev.allDay) { ev.start = ''; ev.end = ''; } else if (!ev.start) { ev.start = '09:00'; }
+        rerenderKeepScroll();
+      } }),
+      timeBlock,
+      row(
+        textField('Building', ev, 'building', { grow: true, placeholder: 'Ka Lama' }),
+        textField('Room number', ev, 'room', { grow: true, placeholder: '102' })),
+      checkField('Special occasion (also listed under Special Occasions)', ev, 'special'),
+      h('div', { class: 'adm-add-row' },
+        button('Duplicate (same day)', () => {
+          const copy = Object.assign({}, ev, { id: KS().uniqueId('ev') });
+          draft.events.push(copy);
+          calOpenId = copy.id;
+          scheduleSave();
+          rerenderKeepScroll();
+        }),
+        confirmButton('Delete event', 'Tap again to delete', () => {
+          draft.events.splice(draft.events.indexOf(ev), 1);
+          calOpenId = null;
+          scheduleSave();
+          rerenderKeepScroll();
+        }, 'danger'))));
+    return card;
+  }
+
+  function calendarSection() {
+    if (!calMonth) resetCalendar();
+    const today = KS().todayISO();
+    const first = new Date(calMonth.y, calMonth.m, 1);
+    const start = new Date(calMonth.y, calMonth.m, 1 - first.getDay());
+    const counts = {};
+    draft.events.forEach(ev => { counts[ev.date] = (counts[ev.date] || 0) + 1; });
+
+    const grid = h('div', { class: 'adm-cal-grid' });
+    DOW.forEach(d => grid.append(h('div', { class: 'adm-cal-dow', text: d })));
+    for (let i = 0; i < 42; i++) {
+      const day = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      const iso = KS().isoDate(day.getFullYear(), day.getMonth(), day.getDate());
+      const cls = ['adm-cal-day'];
+      if (day.getMonth() !== calMonth.m) cls.push('out');
+      if (iso === today) cls.push('today');
+      if (iso === calSelected) cls.push('selected');
+      const btn = h('button', {
+        type: 'button', class: cls.join(' '), 'data-date': iso,
+        onclick: () => { calSelected = iso; calOpenId = null; rerenderKeepScroll(); }
+      }, h('span', { text: String(day.getDate()) }));
+      if (counts[iso]) btn.append(h('span', { class: 'adm-cal-count', text: String(counts[iso]) }));
+      grid.append(btn);
+    }
+
+    const shift = n => {
+      const d = new Date(calMonth.y, calMonth.m + n, 1);
+      calMonth = { y: d.getFullYear(), m: d.getMonth() };
+      rerenderKeepScroll();
+    };
+    const nav = h('div', { class: 'adm-cal-head' },
+      h('button', { type: 'button', class: 'adm-icon-btn', text: '‹', 'aria-label': 'Previous month', onclick: () => shift(-1) }),
+      h('div', { class: 'adm-cal-month', text: `${KS().MONTH_NAMES[calMonth.m]} ${calMonth.y}` }),
+      h('button', { type: 'button', class: 'adm-icon-btn', text: '›', 'aria-label': 'Next month', onclick: () => shift(1) }),
+      h('button', { type: 'button', class: 'adm-btn small', text: 'Today', onclick: () => { resetCalendar(); rerenderKeepScroll(); } }));
+
+    const dayEvents = eventsOn(calSelected);
+    const addEvent = () => {
+      const ev = { id: KS().uniqueId('ev'), date: calSelected, start: '09:00', end: '', allDay: false,
+        title: 'New event', info: '', building: '', room: '', special: false };
+      draft.events.push(ev);
+      calOpenId = ev.id;
+      scheduleSave();
+      rerenderKeepScroll();
+    };
+
+    return section('Event calendar',
+      'Tap a day, then add events. Several events can share the same day and time. The Events page shows upcoming events by date, so past events drop off on their own.',
+      nav, grid,
+      h('div', { class: 'adm-day-head' },
+        h('div', { class: 'adm-h4', text: KS().longDate(calSelected) }),
+        button('+ Add event on this day', addEvent, 'primary')),
+      dayEvents.length
+        ? h('div', { class: 'adm-list' }, dayEvents.map(eventCard))
+        : h('div', { class: 'adm-empty', text: 'No events on this day yet.' }),
+      h('div', { class: 'adm-msg' }));
   }
 
   function flyersTab() {
@@ -733,6 +899,7 @@
     session = { email };
     draft = window.KioskApp.getContent();
     activeTab = 'events';
+    resetCalendar();
     loginBox.hidden = true;
     panelBox.hidden = false;
     buildPanel();

@@ -377,60 +377,45 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   // --- MOCK DATA: EVENTS ---
+  // Sample events are placed relative to today so the kiosk always has something
+  // to show until staff add real ones in the admin calendar.
+  const sampleDate = days => KioskStore.addDaysISO(KioskStore.todayISO(), days);
   const defaultEvents = [
     {
-      filter: "week",
-      mon: "OCT",
-      day: "28",
+      id: "ev-sample-1", date: sampleDate(1), start: "11:30", end: "13:00", allDay: false,
       title: "HOST Industry Speaker: Luxury Resort Trends",
-      time: "11:30 AM – 1:00 PM",
-      location: "Ka Lama Rm 102",
-      desc: "Guest lecture with Maui resort general managers discussing hospitality innovations and post-graduation hiring."
+      info: "Guest lecture with Maui resort general managers discussing hospitality innovations and post-graduation hiring.",
+      building: "Ka Lama", room: "102", special: false
     },
     {
-      filter: "week",
-      mon: "OCT",
-      day: "30",
+      id: "ev-sample-2", date: sampleDate(3), start: "13:00", end: "15:30", allDay: false,
       title: "Resume & LinkedIn Touch-Up Clinic",
-      time: "1:00 PM – 3:30 PM",
-      location: "Ka Lama Rm 201 Computer Lab",
-      desc: "Drop in for 1-on-1 resume reviews and optimize your profile before fall career recruiting begins."
+      info: "Drop in for 1-on-1 resume reviews and optimize your profile before career recruiting begins.",
+      building: "Ka Lama", room: "201 Computer Lab", special: false
     },
     {
-      filter: "month",
-      mon: "NOV",
-      day: "12",
+      id: "ev-sample-3", date: sampleDate(3), start: "13:00", end: "14:30", allDay: false,
+      title: "Accounting Tutoring Open Hours",
+      info: "Free drop-in help from peer tutors. Runs at the same time as the resume clinic.",
+      building: "Ka Lama", room: "104", special: false
+    },
+    {
+      id: "ev-sample-4", date: sampleDate(10), start: "13:00", end: "16:00", allDay: false,
       title: "ABIT Senior Venture Pitch & Demo Showcase",
-      time: "1:00 PM – 4:00 PM",
-      location: "Ka Lama Rm 102",
-      desc: "Senior students present real web apps and business ventures to local community mentors and angel judges."
+      info: "Senior students present real web apps and business ventures to local community mentors and angel judges.",
+      building: "Ka Lama", room: "102", special: false
     },
     {
-      filter: "month",
-      mon: "NOV",
-      day: "18",
-      title: "Accounting Society Fall Speaker Dinner",
-      time: "5:30 PM – 7:30 PM",
-      location: "Pilina Multi-Purpose Room",
-      desc: "Network with Hawaii Society of CPAs representatives and discover scholarship and internship programs."
+      id: "ev-sample-5", date: sampleDate(20), start: "", end: "", allDay: true,
+      title: "Spring Registration Opens",
+      info: "Priority course registration opens for continuing UHMC students. Meet with faculty advisors to graduate on time.",
+      building: "Ka Lama", room: "2nd Floor Advising Hub", special: true
     },
     {
-      filter: "special",
-      mon: "DEC",
-      day: "01",
-      title: "Spring 2027 STAR GPS Registration Opens",
-      time: "All Day • Online & Ka Lama Advising",
-      location: "Ka Lama 2nd Floor Advising Hub",
-      desc: "Priority course registration opens for continuing UHMC students. Meet with faculty advisors to graduate on time."
-    },
-    {
-      filter: "special",
-      mon: "DEC",
-      day: "15",
-      title: "Fall Semester Commencement Celebration",
-      time: "5:00 PM – 7:30 PM",
-      location: "UHMC Great Lawn",
-      desc: "Join us in celebrating our graduating Business, Accounting, HOST, and ABIT degree recipients!"
+      id: "ev-sample-6", date: sampleDate(30), start: "17:00", end: "19:30", allDay: false,
+      title: "Semester Commencement Celebration",
+      info: "Join us in celebrating our graduating Business, Accounting, HOST, and ABIT degree recipients!",
+      building: "UHMC", room: "Great Lawn", special: true
     }
   ];
 
@@ -551,6 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // these variables each time they draw, so applyContent() can swap them out.
   let content = KioskStore.load(defaultContent);
   let eventsData = content.events;
+  let refreshEvents = () => {};
   let programsData = content.programs;
   let contactsByRoom = buildContactsByRoom(content.contacts);
   let slideIndex = 0;
@@ -702,6 +688,7 @@ document.addEventListener('DOMContentLoaded', () => {
       case 'view-events':
         appEl.classList.remove('at-attract');
         screenHeading.textContent = "Events & News";
+        refreshEvents(); // the kiosk may have run past midnight since last draw
         if (btnMainMenu) btnMainMenu.style.display = 'block';
         if (footerIdleHint) footerIdleHint.style.display = 'none';
         state.isIdle = false;
@@ -1187,20 +1174,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardsList = document.getElementById('events-cards-list');
 
     function renderEvents() {
-      const filtered = eventsData.filter(e => e.filter === state.activeEventFilter);
+      const filtered = KioskStore.eventsFor(eventsData, state.activeEventFilter);
 
-      cardsList.innerHTML = filtered.map(ev => `
+      cardsList.innerHTML = filtered.map(ev => {
+        const md = KioskStore.eventMonthDay(ev);
+        const when = KioskStore.eventTimeText(ev);
+        const where = KioskStore.eventLocationText(ev);
+        const meta = [when && `🕒 ${esc(when)}`, where && `📍 ${esc(where)}`].filter(Boolean).join(' · ');
+        return `
         <div class="event-card-item">
           <div class="event-date-col">
-            <span class="event-date-month">${esc(ev.mon)}</span>
-            <span class="event-date-day">${esc(ev.day)}</span>
+            <span class="event-date-month">${esc(md.mon)}</span>
+            <span class="event-date-day">${esc(md.day)}</span>
           </div>
           <div class="event-item-info">
             <div class="event-item-title">${esc(ev.title)}</div>
-            <div class="event-item-sub">🕒 ${esc(ev.time)} · 📍 ${esc(ev.location)}</div>
+            ${meta ? `<div class="event-item-sub">${meta}</div>` : ''}
+            ${ev.info ? `<div class="event-item-desc">${esc(ev.info)}</div>` : ''}
           </div>
-        </div>
-      `).join('') || `
+        </div>`;
+      }).join('') || `
         <div class="event-card-item">
           <div class="event-item-info">
             <div class="event-item-sub">No events listed here right now. Check back soon!</div>
@@ -1208,6 +1201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
     }
+    refreshEvents = renderEvents;
 
     timeTabs.forEach(tab => {
       tab.addEventListener('click', () => {

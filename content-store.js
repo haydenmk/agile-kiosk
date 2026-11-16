@@ -53,6 +53,183 @@
 
   const ATTRACT_WIDGET_IDS = ['slideshow', 'today', 'job', 'ticker'];
   const EVENT_FILTERS = ['week', 'month', 'special'];
+  const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+  // ---------------------------------------------------------- date & events
+  // Dates are plain "YYYY-MM-DD" strings in the kiosk's local time, and times
+  // are "HH:MM" (24-hour), so they sort correctly as text and never shift with
+  // time zones.
+  const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+  const EVENT_TEMPLATE = {
+    id: '', date: '', start: '', end: '', allDay: false,
+    title: '', info: '', building: '', room: '', special: false
+  };
+
+  function pad2(n) {
+    return String(n).padStart(2, '0');
+  }
+
+  function isoDate(year, monthIndex, day) {
+    return `${String(year).padStart(4, '0')}-${pad2(monthIndex + 1)}-${pad2(day)}`;
+  }
+
+  // Returns {y, m (0-11), d} for a real calendar date, otherwise null.
+  function parseISO(text) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(text || ''));
+    if (!match) return null;
+    const y = Number(match[1]);
+    const m = Number(match[2]) - 1;
+    const d = Number(match[3]);
+    const check = new Date(y, m, d);
+    if (check.getFullYear() !== y || check.getMonth() !== m || check.getDate() !== d) return null;
+    return { y, m, d };
+  }
+
+  function todayISO() {
+    const now = new Date();
+    return isoDate(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+
+  function addDaysISO(iso, days) {
+    const parts = parseISO(iso);
+    const base = parts ? new Date(parts.y, parts.m, parts.d) : new Date();
+    base.setDate(base.getDate() + days);
+    return isoDate(base.getFullYear(), base.getMonth(), base.getDate());
+  }
+
+  function lastDayOfMonthISO(iso) {
+    const parts = parseISO(iso) || parseISO(todayISO());
+    return isoDate(parts.y, parts.m, new Date(parts.y, parts.m + 1, 0).getDate());
+  }
+
+  function longDate(iso) {
+    const parts = parseISO(iso);
+    if (!parts) return '';
+    return new Date(parts.y, parts.m, parts.d)
+      .toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  }
+
+  // "14:30" -> "2:30 PM"
+  function formatTime12(hhmm) {
+    if (!TIME_RE.test(String(hhmm || ''))) return '';
+    const hour = Number(hhmm.slice(0, 2));
+    const minute = hhmm.slice(3);
+    return `${hour % 12 || 12}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
+  }
+
+  function eventTimeText(ev) {
+    if (ev.allDay) return 'All day';
+    if (!ev.start) return '';
+    return ev.end ? `${formatTime12(ev.start)} – ${formatTime12(ev.end)}` : formatTime12(ev.start);
+  }
+
+  // "Ka Lama" + "102" -> "Ka Lama Rm 102"
+  function eventLocationText(ev) {
+    return [str(ev.building).trim(), str(ev.room).trim() ? `Rm ${str(ev.room).trim()}` : '']
+      .filter(Boolean)
+      .join(' ');
+  }
+
+  function eventMonthDay(ev) {
+    const parts = parseISO(ev.date);
+    if (!parts) return { mon: '', day: '' };
+    return { mon: MONTH_NAMES[parts.m].slice(0, 3).toUpperCase(), day: pad2(parts.d) };
+  }
+
+  // Oldest first; all-day events lead their day; ties keep their existing order.
+  function compareEvents(a, b) {
+    return (a.date + (a.allDay ? '' : a.start)).localeCompare(b.date + (b.allDay ? '' : b.start));
+  }
+
+  function sortEvents(events) {
+    return events
+      .map((ev, index) => ({ ev, index }))
+      .sort((a, b) => compareEvents(a.ev, b.ev) || a.index - b.index)
+      .map(item => item.ev);
+  }
+
+  /**
+   * Which events the kiosk's Events page shows under a tab, based on real dates:
+   *   week    today through the next 6 days
+   *   month   today through the end of this calendar month
+   *   special events marked "special occasion", from today on
+   * Past events and events without a name are not shown.
+   */
+  function eventsFor(events, filter, today) {
+    const from = today || todayISO();
+    const weekEnd = addDaysISO(from, 6);
+    const monthEnd = lastDayOfMonthISO(from);
+    return sortEvents(events).filter(ev => {
+      if (!ev.title.trim() || ev.date < from) return false;
+      if (filter === 'special') return ev.special;
+      if (filter === 'month') return ev.date <= monthEnd;
+      return ev.date <= weekEnd;
+    });
+  }
+
+  // Convert an event saved by the earlier admin panel (month text, day text,
+  // free-text time/location, "show under" tab) into the new format.
+  function convertLegacyEvent(raw, year) {
+    const monthIndex = MONTH_NAMES.findIndex(name => name.slice(0, 3).toLowerCase() === str(raw.mon).trim().slice(0, 3).toLowerCase());
+    const day = parseInt(raw.day, 10);
+    if (monthIndex < 0 || !(day >= 1 && day <= 31)) return null;
+    const date = isoDate(year, monthIndex, day);
+    if (!parseISO(date)) return null;
+
+    const timeText = str(raw.time);
+    const stamps = [];
+    const timeRe = /(\d{1,2}):(\d{2})\s*([AaPp])\.?[Mm]/g;
+    let hit;
+    while ((hit = timeRe.exec(timeText)) !== null && stamps.length < 2) {
+      let hour = Number(hit[1]) % 12;
+      if (hit[3].toLowerCase() === 'p') hour += 12;
+      stamps.push(`${pad2(hour)}:${hit[2]}`);
+    }
+    let info = str(raw.desc);
+    let allDay = /all[\s-]*day/i.test(timeText);
+    if (!allDay && stamps.length === 0 && timeText.trim()) {
+      // A time we can't read (for example "TBD"): keep the words, list as all day
+      allDay = true;
+      info = `${timeText.trim()}. ${info}`.trim();
+    }
+
+    // "Ka Lama Rm 201 Computer Lab" -> building "Ka Lama", room "201 Computer Lab"
+    const location = str(raw.location).trim();
+    const roomMatch = /^(.*?)\s*\b(?:rm|room)\.?\s+(.+)$/i.exec(location);
+
+    return {
+      id: '',
+      date,
+      start: allDay ? '' : (stamps[0] || ''),
+      end: allDay ? '' : (stamps[1] || ''),
+      allDay,
+      title: str(raw.title),
+      info,
+      building: roomMatch ? roomMatch[1].trim() : location,
+      room: roomMatch ? roomMatch[2].trim() : '',
+      special: raw.filter === 'special'
+    };
+  }
+
+  function cleanEvents(raw) {
+    if (!Array.isArray(raw)) return null;
+    const year = new Date().getFullYear();
+    const seen = new Set();
+    return raw.filter(isObject).map(item => {
+      const source = item.date === undefined && (item.mon !== undefined || item.day !== undefined)
+        ? convertLegacyEvent(item, year)
+        : item;
+      if (!source) return null;
+      const ev = cleanObject(source, EVENT_TEMPLATE);
+      if (!parseISO(ev.date)) return null;
+      ev.start = TIME_RE.test(ev.start) ? ev.start : '';
+      ev.end = TIME_RE.test(ev.end) && ev.start && ev.end > ev.start ? ev.end : '';
+      if (ev.allDay) { ev.start = ''; ev.end = ''; }
+      if (!ev.id || seen.has(ev.id)) ev.id = uniqueId('ev');
+      seen.add(ev.id);
+      return ev;
+    }).filter(Boolean);
+  }
 
   // ---------------------------------------------------------------- helpers
   function clone(value) {
@@ -132,11 +309,8 @@
       ? defaults.menuBannerVisible
       : !!src.menuBannerVisible;
 
-    // Events
-    const events = cleanList(src.events, { filter: 'week', mon: '', day: '', title: '', time: '', location: '', desc: '' });
-    out.events = events
-      ? events.map(e => Object.assign(e, { filter: EVENT_FILTERS.includes(e.filter) ? e.filter : 'week' }))
-      : clone(defaults.events);
+    // Events (calendar entries; older saved events are converted automatically)
+    out.events = cleanEvents(src.events) || cleanEvents(defaults.events) || [];
 
     // Programs (the four program tabs are fixed; their contents are editable)
     out.programs = {};
@@ -276,8 +450,20 @@
     ICONS,
     ATTRACT_WIDGET_IDS,
     EVENT_FILTERS,
+    MONTH_NAMES,
     clone,
     uniqueId,
+    isoDate,
+    parseISO,
+    todayISO,
+    addDaysISO,
+    longDate,
+    formatTime12,
+    eventTimeText,
+    eventLocationText,
+    eventMonthDay,
+    sortEvents,
+    eventsFor,
     sanitize,
     load,
     save,
