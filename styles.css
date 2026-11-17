@@ -939,13 +939,13 @@ body.kiosk-full-mode #kiosk-app {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 49, 60, 0.42) 0%, rgba(0, 31, 43, 0.65) 100%);
+  background: linear-gradient(180deg, rgba(0, 20, 30, 0.50) 0%, rgba(0, 10, 20, 0.72) 100%);
   z-index: 1;
   transition: background 0.25s ease;
 }
 
 .menu-tile:hover::before {
-  background: linear-gradient(180deg, rgba(0, 79, 110, 0.32) 0%, rgba(0, 49, 60, 0.55) 100%);
+  background: linear-gradient(180deg, rgba(0, 20, 30, 0.74) 0%, rgba(0, 10, 20, 0.90) 100%);
 }
 
 .menu-tile:hover {
@@ -1236,7 +1236,7 @@ body.kiosk-full-mode #kiosk-app {
 
 .floor-pill-btn.active {
   background: var(--bg-light);
-  color: #ffffff;
+  color: #000000;
   border-color: var(--uh-gold);
   box-shadow: 0 0 16px rgba(255, 182, 0, 0.25);
 }
