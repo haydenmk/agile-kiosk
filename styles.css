@@ -1,12 +1,12 @@
-/* ==========================================================================
-   UHMC Business Department — Ka Lama Interactive Kiosk Stylesheet
+﻿/* ==========================================================================
+   UHMC Business Department â€” Ka Lama Interactive Kiosk Stylesheet
    Faithfully recreating all 8 wireframes from UHMC Kiosk Lo-Fi Wireframes.pdf
    with premium UHMC brand aesthetics and portrait 9:16 kiosk framing.
    ========================================================================== */
 
 :root {
   /* UHMC Official Brand Palette (colors/UHMC Brand Colors.pdf) */
-  /* Primary Brand Color — Pantone 3025 C */
+  /* Primary Brand Color â€” Pantone 3025 C */
   --uhmc-primary: #004f6e;
   /* C:100 M:65 Y:37 K:21 | R:0 G:79 B:110 */
   --uhmc-primary-light: #006c96;
@@ -911,27 +911,27 @@ body.kiosk-full-mode #kiosk-app {
 
 /* Photo backgrounds for each of the 6 tiles using unused photos */
 .menu-tile-programs {
-  background-image: url('assets/images/unused/Screenshot 2026-11-12 092038.png');
+  background-image: url('assets/images/main_screen/Screenshot 2026-11-12 092038.png');
 }
 
 .menu-tile-directory {
-  background-image: url('assets/images/unused/Screenshot 2026-11-12 092032.png');
+  background-image: url('assets/images/main_screen/Screenshot 2026-11-12 092032.png');
 }
 
 .menu-tile-jobs {
-  background-image: url('assets/images/welcome_screen/Screenshot 2026-11-12 085642.png');
+  background-image: url('assets/images/main_screen/Screenshot 2026-11-12 092103.png');
 }
 
 .menu-tile-events {
-  background-image: url('assets/images/unused/Screenshot 2026-11-12 092057.png');
+  background-image: url('assets/images/main_screen/Screenshot 2026-11-12 092057.png');
 }
 
 .menu-tile-survey {
-  background-image: url('assets/images/unused/Screenshot 2026-11-12 092052.png');
+  background-image: url('assets/images/main_screen/Screenshot 2026-11-12 092052.png');
 }
 
 .menu-tile-website {
-  background-image: url('assets/images/unused/Screenshot 2026-11-12 092045.png');
+  background-image: url('assets/images/main_screen/Screenshot 2026-11-12 092045.png');
 }
 
 /* Brand blue tint overlay so tile text and photos look balanced */
@@ -2580,7 +2580,7 @@ body.kiosk-full-mode #kiosk-app {
 }
 
 /* ==========================================================================
-   GLOBAL FOOTER (Present on Screens 2–8 per wireframes)
+   GLOBAL FOOTER (Present on Screens 2â€“8 per wireframes)
    ========================================================================== */
 .kiosk-footer {
   height: var(--footer-height);
