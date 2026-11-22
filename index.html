@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,8 +10,11 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap"
+    rel="stylesheet">
 </head>
+
 <body class="kiosk-frame-mode">
 
   <!-- TOP KIOSK CONTROLS (Preview & Display helper for testing) -->
@@ -21,11 +25,16 @@
     </div>
     <div class="frame-bar-right">
       <button id="toggle-display-mode" class="frame-btn" title="Toggle Portrait Frame / Full Window">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <rect x="4" y="2" width="16" height="20" rx="2" />
+          <line x1="12" y1="18" x2="12" y2="18.01" />
+        </svg>
         <span id="display-mode-label">Fit Window</span>
       </button>
       <button id="btn-fullscreen-toggle" class="frame-btn" title="Toggle True Fullscreen">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+        </svg>
         <span>Fullscreen</span>
       </button>
     </div>
@@ -53,7 +62,17 @@
             <span id="header-date">Thursday, Oct 25</span>
             <span class="sep">·</span>
             <span id="header-weather" class="weather-pill">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
               78°F Kahului
             </span>
           </div>
@@ -70,75 +89,89 @@
              --------------------------------------------------------------- -->
         <section id="view-attract" class="view-panel active">
           <div class="attract-container" id="attract-touch-trigger">
-            <!-- 1. Rotating Slideshow (Portrait Flyers) -->
+            <!-- 1. Fullscreen Rotating Slideshow using welcome_screen images -->
             <div class="slideshow-card">
               <div class="slideshow-track" id="attract-slideshow">
                 <!-- Slide 1 -->
-                <div class="flyer-slide active" style="--flyer-bg: linear-gradient(145deg, #004f6e 0%, #002530 100%);">
+                <div class="flyer-slide active"
+                  style="--flyer-bg: url('assets/images/welcome_screen/UH Maui_Welcome.png');">
                   <div class="flyer-overlay"></div>
-                  <div class="flyer-badge">Featured Program</div>
+                  <div class="flyer-badge">Welcome to UHMC</div>
                   <div class="flyer-body">
-                    <h2>Applied Business &amp; Info Tech (ABIT)</h2>
-                    <p class="flyer-lead">Island tech starts here.</p>
+                    <h2>University of Hawaiʻi Maui College</h2>
+                    <p class="flyer-lead">Ka Lama Building · Business Department</p>
                     <div class="flyer-meta-row">
-                      <span class="tag-gold">4-Year Bachelor Degree</span>
-                      <span class="tag-gold">100% On Maui</span>
+                      <span class="tag-gold">Touch Screen to Begin</span>
                     </div>
                   </div>
                 </div>
 
                 <!-- Slide 2 -->
-                <div class="flyer-slide" style="--flyer-bg: linear-gradient(145deg, #093758 0%, #031c2e 100%);">
+                <div class="flyer-slide"
+                  style="--flyer-bg: url('assets/images/welcome_screen/UHMC_img_1.jpg');">
                   <div class="flyer-overlay"></div>
-                  <div class="flyer-badge">Hospitality &amp; Tourism</div>
+                  <div class="flyer-badge">Hands-On Learning</div>
                   <div class="flyer-body">
-                    <h2>Lead Maui's Premier Resorts &amp; Tourism</h2>
-                    <p class="flyer-lead">Lead Maui's next great guest experience.</p>
+                    <h2>Explore Programs &amp; Degrees</h2>
+                    <p class="flyer-lead">ABIT · Accounting · Business · Hospitality</p>
                     <div class="flyer-meta-row">
-                      <span class="tag-gold">Guaranteed Internships</span>
-                      <span class="tag-gold">Direct Career Track</span>
+                      <span class="tag-gold">Touch Screen to Begin</span>
                     </div>
                   </div>
                 </div>
 
                 <!-- Slide 3 -->
-                <div class="flyer-slide" style="--flyer-bg: linear-gradient(145deg, #5c2c16 0%, #2f1508 100%);">
+                <div class="flyer-slide"
+                  style="--flyer-bg: url('assets/images/welcome_screen/UH Maui.jpg');">
                   <div class="flyer-overlay"></div>
-                  <div class="flyer-badge">Student Event</div>
+                  <div class="flyer-badge">Student Collaboration</div>
                   <div class="flyer-body">
-                    <h2>Fall Business Capstone &amp; Pitch Day</h2>
-                    <p class="flyer-lead">Nov 12 · Ka Lama 102</p>
+                    <h2>Interactive Campus &amp; Directory</h2>
+                    <p class="flyer-lead">Find faculty, classrooms, labs &amp; student resources</p>
                     <div class="flyer-meta-row">
-                      <span class="tag-gold">Ka Lama 102</span>
-                      <span class="tag-gold">Free Refreshments</span>
+                      <span class="tag-gold">Touch Screen to Begin</span>
                     </div>
                   </div>
                 </div>
 
                 <!-- Slide 4 -->
-                <div class="flyer-slide" style="--flyer-bg: linear-gradient(145deg, #2b3a42 0%, #151e23 100%);">
+                <div class="flyer-slide"
+                  style="--flyer-bg: url('assets/images/welcome_screen/UH Maui (2).jpg');">
                   <div class="flyer-overlay"></div>
-                  <div class="flyer-badge">Career Opportunity</div>
+                  <div class="flyer-badge">Campus Opportunities</div>
                   <div class="flyer-body">
-                    <h2>Student Help &amp; Lab Assistant Positions</h2>
-                    <p class="flyer-lead">Flexible campus work while you study.</p>
+                    <h2>Careers, Internships &amp; Events</h2>
+                    <p class="flyer-lead">Discover on-campus jobs &amp; upcoming college events</p>
                     <div class="flyer-meta-row">
-                      <span class="tag-gold">$16.50/hr</span>
-                      <span class="tag-gold">Apply at Ka Lama 203</span>
+                      <span class="tag-gold">Touch Screen to Begin</span>
                     </div>
                   </div>
                 </div>
 
                 <!-- Slide 5 -->
-                <div class="flyer-slide" style="--flyer-bg: linear-gradient(145deg, #004f6e 0%, #00313c 100%);">
+                <div class="flyer-slide"
+                  style="--flyer-bg: url('assets/images/welcome_screen/55279649133_52bc572d25_k.jpg');">
                   <div class="flyer-overlay"></div>
-                  <div class="flyer-badge">Advising &amp; Registration</div>
+                  <div class="flyer-badge">Campus Life</div>
                   <div class="flyer-body">
-                    <h2>Spring 2027 Registration Starts Soon</h2>
-                    <p class="flyer-lead">Spring 2027 planning starts soon.</p>
+                    <h2>Join Our Community</h2>
+                    <p class="flyer-lead">Connecting island students to future careers</p>
                     <div class="flyer-meta-row">
-                      <span class="tag-gold">Walk-ins Welcome</span>
-                      <span class="tag-gold">Ka Lama 2nd Floor</span>
+                      <span class="tag-gold">Touch Screen to Begin</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Slide 6 -->
+                <div class="flyer-slide"
+                  style="--flyer-bg: url('assets/images/welcome_screen/55279910055_e8931d2884_k.jpg');">
+                  <div class="flyer-overlay"></div>
+                  <div class="flyer-badge">Ka Lama Information</div>
+                  <div class="flyer-body">
+                    <h2>Student Advising &amp; Resources</h2>
+                    <p class="flyer-lead">Visit advising and support services on the 2nd floor</p>
+                    <div class="flyer-meta-row">
+                      <span class="tag-gold">Touch Screen to Begin</span>
                     </div>
                   </div>
                 </div>
@@ -151,89 +184,8 @@
                 <span class="dot"></span>
                 <span class="dot"></span>
                 <span class="dot"></span>
+                <span class="dot"></span>
               </div>
-            </div>
-
-            <!-- 2. Today in Ka Lama Schedule Card -->
-            <div class="attract-card today-card">
-              <div class="card-head">
-                <div class="title-with-icon">
-                  <span class="icon-indicator"></span>
-                  <h3>Today in Ka Lama</h3>
-                </div>
-                <span class="badge-subtle">Building Schedule</span>
-              </div>
-              <div class="today-list">
-                <div class="today-item">
-                  <div class="time-pill">9:00 AM</div>
-                  <div class="today-details">
-                    <span class="item-title">BUS 120: Principles of Management</span>
-                    <span class="item-sub">Ka Lama 101 Lecture Hall</span>
-                  </div>
-                </div>
-                <div class="today-item">
-                  <div class="time-pill">11:30 AM</div>
-                  <div class="today-details">
-                    <span class="item-title">HOST Industry Guest Speaker &amp; Lunch</span>
-                    <span class="item-sub">Ka Lama 102 Active Learning Lab</span>
-                  </div>
-                </div>
-                <div class="today-item">
-                  <div class="time-pill">2:00 PM</div>
-                  <div class="today-details">
-                    <span class="item-title">ABIT Open Cyber Lab &amp; Mentoring</span>
-                    <span class="item-sub">Ka Lama 202 Technology Hub</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 3. Featured Job Posting Card -->
-            <div class="attract-card featured-job-card">
-              <div class="qr-col">
-                <div class="qr-box" id="qr-attract-job">
-                  <!-- SVG QR Code -->
-                  <svg viewBox="0 0 29 29" class="qr-code-svg">
-                    <path fill="#000" d="M0 0h7v7H0zm1 1v5h5V1zm8 0h1v1H9zm2 0h2v1h-2zm3 0h1v1h-1zm2 0h1v1h-1zm3 0h1v1h-1zm2 0h7v7h-7zm1 1v5h5V1zm-9 1h1v1h-1zm3 0h1v2h-1zm-4 1h2v1H9zm7 0h1v1h-1zm-6 1h1v1H9zm2 0h1v1h-1zm1 1h1v1h-1zm2 0h1v1h-1zm-7 1h1v1H9zm2 0h1v1h-1zm1 1h1v1h-1zm-8 1h1v1H2zm3 0h1v1H5zm6 0h2v1h-2zm4 0h1v1h-1zm2 0h2v1h-2zm5 0h1v1h-1zm-18 1h2v1H3zm6 0h1v1H9zm3 0h1v1h-1zm4 0h1v1h-1zm3 0h1v1h-1zm2 0h1v1h-1zm-18 1h1v1H1zm2 0h1v1H3zm3 0h2v1H6zm3 0h1v1H9zm5 0h1v1h-1zm2 0h1v1h-1zm4 0h1v1h-1zm-17 1h1v1H0zm4 0h1v1H4zm3 0h2v1H7zm4 0h1v1h-1zm2 0h2v1h-2zm4 0h1v1h-1zm-17 1h1v1H1zm3 0h1v1H4zm3 0h1v1H7zm3 0h2v1h-2zm4 0h1v1h-1zm3 0h1v1h-1zm-18 1h7v7H0zm1 1v5h5v-5zm8 0h1v1H9zm2 0h1v1h-1zm4 0h1v2h-1zm3 0h2v1h-2zm-8 1h2v1H9zm7 0h2v1h-2zm-6 1h1v1h-1zm3 0h1v1h-1zm4 0h1v1h-1zm-6 1h2v1h-2zm3 0h1v1h-1zm3 0h1v1h-1zm-8 1h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm5 0h1v1h-1zm-8 1h1v1H9zm4 0h2v1h-2zm4 0h1v1h-1zM2 2h3v3H2zm20 0h3v3h-3zM2 24h3v3H2z"/>
-                  </svg>
-                  <span class="qr-label">QR CODE</span>
-                </div>
-              </div>
-              <div class="job-info-col">
-                <span class="job-badge-pill">Hot Job On Maui</span>
-                <h4 class="job-title-highlight">Business Analyst Intern</h4>
-                <p class="job-meta-line">Maui High Performance Computing Center (MHPCC)</p>
-                <div class="job-perks">
-                  <span>💰 $22.00 / hr</span>
-                  <span>📍 Kihei, Maui</span>
-                  <span>⏱️ Flexible Student Hours</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- 4. Scrolling News Ticker -->
-            <div class="news-ticker-bar">
-              <div class="ticker-badge">NEWS</div>
-              <div class="ticker-viewport">
-                <div class="ticker-track">
-                  <span>UHMC Spring 2027 Registration opens Dec 1</span>
-                  <span class="bullet">•</span>
-                  <span>Ka Lama 201 Open Computer Lab hours: Mon–Fri 8:00 AM – 5:00 PM</span>
-                  <span class="bullet">•</span>
-                  <span>Free VITA Volunteer Tax Preparation starting next month</span>
-                  <span class="bullet">•</span>
-                  <span>Maui County Internship stipend applications now open</span>
-                  <span class="bullet">•</span>
-                  <span>Ka Lama Advising Office walk-ins available daily on 2nd floor</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- 5. Big Dark Touch Banner -->
-            <div class="touch-begin-banner">
-              <div class="pulse-ring"></div>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
-              <span>Touch anywhere to begin</span>
             </div>
           </div>
         </section>
@@ -247,87 +199,47 @@
               <h2>What would you like to do?</h2>
             </div>
 
-            <!-- Featured Promo Banner (Display only, out of easy reach) -->
-            <div class="featured-banner-card" data-action="view-events">
-              <div class="banner-badge" id="banner-badge-text">FEATURED ANNOUNCEMENT</div>
-              <div class="banner-content">
-                <h3 id="banner-title">Spring 2027 Registration &amp; Academic Advising Now Open</h3>
-                <p id="banner-body">Plan your degree pathways with Ka Lama business faculty. Stop by 2nd Floor offices or schedule via STAR GPS.</p>
-              </div>
-              <div class="banner-action-indicator">
-                <span>View Details →</span>
-              </div>
-            </div>
-
-            <div class="menu-section-label">
-              <span>Tap a tile below</span>
-            </div>
-
             <!-- 2x3 Grid of 6 Tiles -->
             <div class="menu-grid-2x3">
               <!-- Tile 1 -->
               <button class="menu-tile menu-tile-programs" data-view="view-programs">
-                <div class="tile-icon-circle">
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10M6 14h6"/></svg>
-                </div>
                 <div class="tile-text">
                   <h3>Business Programs</h3>
-                  <p>Business · Hospitality · Accounting · ABIT</p>
                 </div>
               </button>
 
               <!-- Tile 2 -->
               <button class="menu-tile menu-tile-directory" data-view="view-directory">
-                <div class="tile-icon-circle">
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-                </div>
                 <div class="tile-text">
                   <h3>Building Directory</h3>
-                  <p>Rooms and offices, floors 1–2</p>
                 </div>
               </button>
 
               <!-- Tile 3 -->
               <button class="menu-tile menu-tile-jobs" data-view="view-jobs">
-                <div class="tile-icon-circle">
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                </div>
                 <div class="tile-text">
                   <h3>Job Opportunities</h3>
-                  <p>Business jobs and internships</p>
                 </div>
               </button>
 
               <!-- Tile 4 -->
               <button class="menu-tile menu-tile-events" data-view="view-events">
-                <div class="tile-icon-circle">
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                </div>
                 <div class="tile-text">
                   <h3>Events &amp; News</h3>
-                  <p>Events, marketing, special occasions</p>
                 </div>
               </button>
 
               <!-- Tile 5 -->
               <button class="menu-tile menu-tile-survey" data-view="view-survey">
-                <div class="tile-icon-circle">
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>
-                </div>
                 <div class="tile-text">
                   <h3>Student Survey</h3>
-                  <p>Share your ideas for campus</p>
                 </div>
               </button>
 
               <!-- Tile 6 -->
               <button class="menu-tile menu-tile-website" data-view="view-website">
-                <div class="tile-icon-circle">
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                </div>
                 <div class="tile-text">
                   <h3>UHMC Website</h3>
-                  <p>Browse maui.hawaii.edu</p>
                 </div>
               </button>
             </div>
@@ -342,7 +254,8 @@
             <div class="dir-selection-bar">
               <div class="dir-selected-info">
                 <span class="floor-title-active" id="dir-active-floor-label">Ka Lama · 1st Floor</span>
-                <span class="selected-room-pill" id="dir-active-room-pill">Selected: Rm KL-101 · Business Dept. Office</span>
+                <span class="selected-room-pill" id="dir-active-room-pill">Selected: Rm KL-101 · Business Dept.
+                  Office</span>
               </div>
             </div>
 
@@ -370,7 +283,10 @@
             <div class="dir-search-wrap">
               <label for="input-dir-search">Search rooms, offices, or people</label>
               <div class="search-input-group">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
                 <input type="text" id="input-dir-search" placeholder="Type a name or room number" autocomplete="off">
                 <button id="btn-clear-dir-search" class="clear-search-btn">Clear</button>
               </div>
@@ -399,13 +315,15 @@
               <div class="program-media-badge">PROGRAM OVERVIEW</div>
               <div class="program-hero-title-area">
                 <h2 id="prog-title">Business Administration</h2>
-                <p id="prog-tagline" class="prog-tagline">Empowering island business leaders, entrepreneurs, and managers.</p>
+                <p id="prog-tagline" class="prog-tagline">Empowering island business leaders, entrepreneurs, and
+                  managers.</p>
               </div>
             </div>
 
             <!-- Program Description -->
             <div class="program-desc-card">
-              <p id="prog-description">Comprehensive education in management, marketing, financial planning, business law, and entrepreneurial ventures on Maui.</p>
+              <p id="prog-description">Comprehensive education in management, marketing, financial planning, business
+                law, and entrepreneurial ventures on Maui.</p>
             </div>
 
             <!-- 2-Column Cards: Degrees & Career Paths -->
@@ -431,7 +349,8 @@
             <div class="program-advisor-card">
               <div class="advisor-qr-box">
                 <svg viewBox="0 0 29 29" class="qr-code-svg">
-                  <path fill="#000" d="M0 0h7v7H0zm1 1v5h5V1zm8 0h1v1H9zm2 0h2v1h-2zm3 0h1v1h-1zm2 0h1v1h-1zm3 0h1v1h-1zm2 0h7v7h-7zm1 1v5h5V1zm-9 1h1v1h-1zm3 0h1v2h-1zm-4 1h2v1H9zm7 0h1v1h-1zm-6 1h1v1H9zm2 0h1v1h-1zm1 1h1v1h-1zm2 0h1v1h-1zm-7 1h1v1H9zm2 0h1v1h-1zm1 1h1v1h-1zm-8 1h1v1H2zm3 0h1v1H5zm6 0h2v1h-2zm4 0h1v1h-1zm2 0h2v1h-2zm5 0h1v1h-1zm-18 1h2v1H3zm6 0h1v1H9zm3 0h1v1h-1zm4 0h1v1h-1zm3 0h1v1h-1zm2 0h1v1h-1zm-18 1h1v1H1zm2 0h1v1H3zm3 0h2v1H6zm3 0h1v1H9zm5 0h1v1h-1zm2 0h1v1h-1zm4 0h1v1h-1zm-17 1h1v1H0zm4 0h1v1H4zm3 0h2v1H7zm4 0h1v1h-1zm2 0h2v1h-2zm4 0h1v1h-1zm-17 1h1v1H1zm3 0h1v1H4zm3 0h1v1H7zm3 0h2v1h-2zm4 0h1v1h-1zm3 0h1v1h-1zm-18 1h7v7H0zm1 1v5h5v-5zm8 0h1v1H9zm2 0h1v1h-1zm4 0h1v2h-1zm3 0h2v1h-2zm-8 1h2v1H9zm7 0h2v1h-2zm-6 1h1v1h-1zm3 0h1v1h-1zm4 0h1v1h-1zm-6 1h2v1h-2zm3 0h1v1h-1zm3 0h1v1h-1zm-8 1h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm5 0h1v1h-1zm-8 1h1v1H9zm4 0h2v1h-2zm4 0h1v1h-1zM2 2h3v3H2zm20 0h3v3h-3zM2 24h3v3H2z"/>
+                  <path fill="#000"
+                    d="M0 0h7v7H0zm1 1v5h5V1zm8 0h1v1H9zm2 0h2v1h-2zm3 0h1v1h-1zm2 0h1v1h-1zm3 0h1v1h-1zm2 0h7v7h-7zm1 1v5h5V1zm-9 1h1v1h-1zm3 0h1v2h-1zm-4 1h2v1H9zm7 0h1v1h-1zm-6 1h1v1H9zm2 0h1v1h-1zm1 1h1v1h-1zm2 0h1v1h-1zm-7 1h1v1H9zm2 0h1v1h-1zm1 1h1v1h-1zm-8 1h1v1H2zm3 0h1v1H5zm6 0h2v1h-2zm4 0h1v1h-1zm2 0h2v1h-2zm5 0h1v1h-1zm-18 1h2v1H3zm6 0h1v1H9zm3 0h1v1h-1zm4 0h1v1h-1zm3 0h1v1h-1zm2 0h1v1h-1zm-18 1h1v1H1zm2 0h1v1H3zm3 0h2v1H6zm3 0h1v1H9zm5 0h1v1h-1zm2 0h1v1h-1zm4 0h1v1h-1zm-17 1h1v1H0zm4 0h1v1H4zm3 0h2v1H7zm4 0h1v1h-1zm2 0h2v1h-2zm4 0h1v1h-1zm-17 1h1v1H1zm3 0h1v1H4zm3 0h1v1H7zm3 0h2v1h-2zm4 0h1v1h-1zm3 0h1v1h-1zm-18 1h7v7H0zm1 1v5h5v-5zm8 0h1v1H9zm2 0h1v1h-1zm4 0h1v2h-1zm3 0h2v1h-2zm-8 1h2v1H9zm7 0h2v1h-2zm-6 1h1v1h-1zm3 0h1v1h-1zm4 0h1v1h-1zm-6 1h2v1h-2zm3 0h1v1h-1zm3 0h1v1h-1zm-8 1h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm5 0h1v1h-1zm-8 1h1v1H9zm4 0h2v1h-2zm4 0h1v1h-1zM2 2h3v3H2zm20 0h3v3h-3zM2 24h3v3H2z" />
                 </svg>
                 <span>QR CODE</span>
               </div>
@@ -490,14 +409,16 @@
               </div>
 
               <p id="sel-job-desc" class="sel-job-desc">
-                Assist defense and research analysts with operational workflows, data reporting, and tech documentation. Open to ABIT and Business students.
+                Assist defense and research analysts with operational workflows, data reporting, and tech documentation.
+                Open to ABIT and Business students.
               </p>
 
               <!-- QR Card inside job card -->
               <div class="job-apply-qr-card">
                 <div class="job-qr-box">
                   <svg viewBox="0 0 29 29" class="qr-code-svg">
-                    <path fill="#000" d="M0 0h7v7H0zm1 1v5h5V1zm8 0h1v1H9zm2 0h2v1h-2zm3 0h1v1h-1zm2 0h1v1h-1zm3 0h1v1h-1zm2 0h7v7h-7zm1 1v5h5V1zm-9 1h1v1h-1zm3 0h1v2h-1zm-4 1h2v1H9zm7 0h1v1h-1zm-6 1h1v1H9zm2 0h1v1h-1zm1 1h1v1h-1zm2 0h1v1h-1zm-7 1h1v1H9zm2 0h1v1h-1zm1 1h1v1h-1zm-8 1h1v1H2zm3 0h1v1H5zm6 0h2v1h-2zm4 0h1v1h-1zm2 0h2v1h-2zm5 0h1v1h-1zm-18 1h2v1H3zm6 0h1v1H9zm3 0h1v1h-1zm4 0h1v1h-1zm3 0h1v1h-1zm2 0h1v1h-1zm-18 1h1v1H1zm2 0h1v1H3zm3 0h2v1H6zm3 0h1v1H9zm5 0h1v1h-1zm2 0h1v1h-1zm4 0h1v1h-1zm-17 1h1v1H0zm4 0h1v1H4zm3 0h2v1H7zm4 0h1v1h-1zm2 0h2v1h-2zm4 0h1v1h-1zm-17 1h1v1H1zm3 0h1v1H4zm3 0h1v1H7zm3 0h2v1h-2zm4 0h1v1h-1zm3 0h1v1h-1zm-18 1h7v7H0zm1 1v5h5v-5zm8 0h1v1H9zm2 0h1v1h-1zm4 0h1v2h-1zm3 0h2v1h-2zm-8 1h2v1H9zm7 0h2v1h-2zm-6 1h1v1h-1zm3 0h1v1h-1zm4 0h1v1h-1zm-6 1h2v1h-2zm3 0h1v1h-1zm3 0h1v1h-1zm-8 1h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm5 0h1v1h-1zm-8 1h1v1H9zm4 0h2v1h-2zm4 0h1v1h-1zM2 2h3v3H2zm20 0h3v3h-3zM2 24h3v3H2z"/>
+                    <path fill="#000"
+                      d="M0 0h7v7H0zm1 1v5h5V1zm8 0h1v1H9zm2 0h2v1h-2zm3 0h1v1h-1zm2 0h1v1h-1zm3 0h1v1h-1zm2 0h7v7h-7zm1 1v5h5V1zm-9 1h1v1h-1zm3 0h1v2h-1zm-4 1h2v1H9zm7 0h1v1h-1zm-6 1h1v1H9zm2 0h1v1h-1zm1 1h1v1h-1zm2 0h1v1h-1zm-7 1h1v1H9zm2 0h1v1h-1zm1 1h1v1h-1zm-8 1h1v1H2zm3 0h1v1H5zm6 0h2v1h-2zm4 0h1v1h-1zm2 0h2v1h-2zm5 0h1v1h-1zm-18 1h2v1H3zm6 0h1v1H9zm3 0h1v1h-1zm4 0h1v1h-1zm3 0h1v1h-1zm2 0h1v1h-1zm-18 1h1v1H1zm2 0h1v1H3zm3 0h2v1H6zm3 0h1v1H9zm5 0h1v1h-1zm2 0h1v1h-1zm4 0h1v1h-1zm-17 1h1v1H0zm4 0h1v1H4zm3 0h2v1H7zm4 0h1v1h-1zm2 0h2v1h-2zm4 0h1v1h-1zm-17 1h1v1H1zm3 0h1v1H4zm3 0h1v1H7zm3 0h2v1h-2zm4 0h1v1h-1zm3 0h1v1h-1zm-18 1h7v7H0zm1 1v5h5v-5zm8 0h1v1H9zm2 0h1v1h-1zm4 0h1v2h-1zm3 0h2v1h-2zm-8 1h2v1H9zm7 0h2v1h-2zm-6 1h1v1h-1zm3 0h1v1h-1zm4 0h1v1h-1zm-6 1h2v1h-2zm3 0h1v1h-1zm3 0h1v1h-1zm-8 1h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm5 0h1v1h-1zm-8 1h1v1H9zm4 0h2v1h-2zm4 0h1v1h-1zM2 2h3v3H2zm20 0h3v3h-3zM2 24h3v3H2z" />
                   </svg>
                   <span>QR CODE</span>
                 </div>
@@ -567,14 +488,16 @@
                   <span class="loc-item" id="feat-location">📍 Ka Lama Rm 102</span>
                 </div>
                 <p class="featured-event-summary" id="feat-summary">
-                  Join our community of Maui mentors, entrepreneurs, and students. Refreshments served. Open to all students, alumni, and local business leaders.
+                  Join our community of Maui mentors, entrepreneurs, and students. Refreshments served. Open to all
+                  students, alumni, and local business leaders.
                 </p>
 
                 <!-- RSVP QR Code -->
                 <div class="event-rsvp-card">
                   <div class="event-qr-box">
                     <svg viewBox="0 0 29 29" class="qr-code-svg">
-                      <path fill="#000" d="M0 0h7v7H0zm1 1v5h5V1zm8 0h1v1H9zm2 0h2v1h-2zm3 0h1v1h-1zm2 0h1v1h-1zm3 0h1v1h-1zm2 0h7v7h-7zm1 1v5h5V1zm-9 1h1v1h-1zm3 0h1v2h-1zm-4 1h2v1H9zm7 0h1v1h-1zm-6 1h1v1H9zm2 0h1v1h-1zm1 1h1v1h-1zm2 0h1v1h-1zm-7 1h1v1H9zm2 0h1v1h-1zm1 1h1v1h-1zm-8 1h1v1H2zm3 0h1v1H5zm6 0h2v1h-2zm4 0h1v1h-1zm2 0h2v1h-2zm5 0h1v1h-1zm-18 1h2v1H3zm6 0h1v1H9zm3 0h1v1h-1zm4 0h1v1h-1zm3 0h1v1h-1zm2 0h1v1h-1zm-18 1h1v1H1zm2 0h1v1H3zm3 0h2v1H6zm3 0h1v1H9zm5 0h1v1h-1zm2 0h1v1h-1zm4 0h1v1h-1zm-17 1h1v1H0zm4 0h1v1H4zm3 0h2v1H7zm4 0h1v1h-1zm2 0h2v1h-2zm4 0h1v1h-1zm-17 1h1v1H1zm3 0h1v1H4zm3 0h1v1H7zm3 0h2v1h-2zm4 0h1v1h-1zm3 0h1v1h-1zm-18 1h7v7H0zm1 1v5h5v-5zm8 0h1v1H9zm2 0h1v1h-1zm4 0h1v2h-1zm3 0h2v1h-2zm-8 1h2v1H9zm7 0h2v1h-2zm-6 1h1v1h-1zm3 0h1v1h-1zm4 0h1v1h-1zm-6 1h2v1h-2zm3 0h1v1h-1zm3 0h1v1h-1zm-8 1h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm5 0h1v1h-1zm-8 1h1v1H9zm4 0h2v1h-2zm4 0h1v1h-1zM2 2h3v3H2zm20 0h3v3h-3zM2 24h3v3H2z"/>
+                      <path fill="#000"
+                        d="M0 0h7v7H0zm1 1v5h5V1zm8 0h1v1H9zm2 0h2v1h-2zm3 0h1v1h-1zm2 0h1v1h-1zm3 0h1v1h-1zm2 0h7v7h-7zm1 1v5h5V1zm-9 1h1v1h-1zm3 0h1v2h-1zm-4 1h2v1H9zm7 0h1v1h-1zm-6 1h1v1H9zm2 0h1v1h-1zm1 1h1v1h-1zm2 0h1v1h-1zm-7 1h1v1H9zm2 0h1v1h-1zm1 1h1v1h-1zm-8 1h1v1H2zm3 0h1v1H5zm6 0h2v1h-2zm4 0h1v1h-1zm2 0h2v1h-2zm5 0h1v1h-1zm-18 1h2v1H3zm6 0h1v1H9zm3 0h1v1h-1zm4 0h1v1h-1zm3 0h1v1h-1zm2 0h1v1h-1zm-18 1h1v1H1zm2 0h1v1H3zm3 0h2v1H6zm3 0h1v1H9zm5 0h1v1h-1zm2 0h1v1h-1zm4 0h1v1h-1zm-17 1h1v1H0zm4 0h1v1H4zm3 0h2v1H7zm4 0h1v1h-1zm2 0h2v1h-2zm4 0h1v1h-1zm-17 1h1v1H1zm3 0h1v1H4zm3 0h1v1H7zm3 0h2v1h-2zm4 0h1v1h-1zm3 0h1v1h-1zm-18 1h7v7H0zm1 1v5h5v-5zm8 0h1v1H9zm2 0h1v1h-1zm4 0h1v2h-1zm3 0h2v1h-2zm-8 1h2v1H9zm7 0h2v1h-2zm-6 1h1v1h-1zm3 0h1v1h-1zm4 0h1v1h-1zm-6 1h2v1h-2zm3 0h1v1h-1zm3 0h1v1h-1zm-8 1h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm5 0h1v1h-1zm-8 1h1v1H9zm4 0h2v1h-2zm4 0h1v1h-1zM2 2h3v3H2zm20 0h3v3h-3zM2 24h3v3H2z" />
                     </svg>
                     <span>QR CODE</span>
                   </div>
@@ -614,7 +537,9 @@
                 </div>
               </div>
               <div class="survey-privacy-tag">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
                 <span>Anonymous · no personal info collected</span>
               </div>
             </div>
@@ -628,7 +553,8 @@
             <div class="survey-art-card">
               <div class="survey-art-inner">
                 <span class="survey-art-icon" id="survey-art-icon">🎓</span>
-                <span class="survey-art-subtitle" id="survey-art-subtitle">UHMC Student Voice • Shaping Campus Life</span>
+                <span class="survey-art-subtitle" id="survey-art-subtitle">UHMC Student Voice • Shaping Campus
+                  Life</span>
               </div>
             </div>
 
@@ -674,7 +600,10 @@
               <!-- Security / Guard Header -->
               <div class="browser-guard-notice">
                 <div class="guard-pill">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
                   <span>EMBEDDED UHMC WEBSITE (maui.hawaii.edu)</span>
                 </div>
                 <span class="guard-sub">touch-scrollable · links outside hawaii.edu blocked</span>
@@ -683,7 +612,12 @@
               <!-- Browser Address Bar -->
               <div class="browser-address-bar">
                 <div class="address-box">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" x2="22" y1="12" y2="12" />
+                    <path
+                      d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                  </svg>
                   <span class="url-text" id="browser-url-display">maui.hawaii.edu / business</span>
                 </div>
                 <span class="readonly-badge">Read-only address</span>
@@ -694,12 +628,24 @@
                 <button class="b-ctrl-btn" id="b-btn-back">‹ Back</button>
                 <button class="b-ctrl-btn" id="b-btn-forward">Forward ›</button>
                 <button class="b-ctrl-btn" id="b-btn-reload">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 4 23 10 17 10" />
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                  </svg>
                   Reload
                 </button>
                 <button class="b-ctrl-btn" id="b-btn-home">Site Home</button>
                 <button class="b-ctrl-btn" id="b-btn-keyboard">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6" y2="8"/><line x1="10" y1="8" x2="10" y2="8"/><line x1="14" y1="8" x2="14" y2="8"/><line x1="18" y1="8" x2="18" y2="8"/><line x1="6" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="18" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <line x1="6" y1="8" x2="6" y2="8" />
+                    <line x1="10" y1="8" x2="10" y2="8" />
+                    <line x1="14" y1="8" x2="14" y2="8" />
+                    <line x1="18" y1="8" x2="18" y2="8" />
+                    <line x1="6" y1="12" x2="6" y2="12" />
+                    <line x1="18" y1="12" x2="18" y2="12" />
+                    <line x1="7" y1="16" x2="17" y2="16" />
+                  </svg>
                   Keyboard
                 </button>
               </div>
@@ -775,8 +721,13 @@
               <!-- Security / Session Timeout Bar -->
               <div class="browser-session-bar">
                 <div class="session-notice">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                  <span>Session clears after <strong>2 min</strong> idle. Please don't sign in to personal accounts here.</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  <span>Session clears after <strong>2 min</strong> idle. Please don't sign in to personal accounts
+                    here.</span>
                 </div>
                 <button id="btn-end-web-session" class="btn-end-session">End Session</button>
               </div>
@@ -879,21 +830,24 @@
               <span class="help-bullet">👆</span>
               <div>
                 <h4>Touch Navigation</h4>
-                <p>Tap any card, directory room, or category chip. Use the bottom navigation bar at any time to return to the <strong>Main Menu</strong> or <strong>Exit</strong> to the attract screen.</p>
+                <p>Tap any card, directory room, or category chip. Use the bottom navigation bar at any time to return
+                  to the <strong>Main Menu</strong> or <strong>Exit</strong> to the attract screen.</p>
               </div>
             </div>
             <div class="help-item">
               <span class="help-bullet">📱</span>
               <div>
                 <h4>Mobile QR Codes</h4>
-                <p>Point your smartphone camera at any on-screen QR code to save job postings, RSVP for events, or contact faculty advisors directly.</p>
+                <p>Point your smartphone camera at any on-screen QR code to save job postings, RSVP for events, or
+                  contact faculty advisors directly.</p>
               </div>
             </div>
             <div class="help-item">
               <span class="help-bullet">🏫</span>
               <div>
                 <h4>Need In-Person Assistance?</h4>
-                <p>Visit the <strong>Business Department Office in Ka Lama 203</strong> (2nd Floor) or call (808) 984-3381 during normal campus hours.</p>
+                <p>Visit the <strong>Business Department Office in Ka Lama 203</strong> (2nd Floor) or call (808)
+                  984-3381 during normal campus hours.</p>
               </div>
             </div>
           </div>
@@ -914,7 +868,8 @@
             <button class="modal-close-btn" data-close="modal-keyboard">✕</button>
           </div>
           <div class="modal-body">
-            <input type="text" id="keyboard-input-display" class="keyboard-input-display" placeholder="Tap keys below..." readonly>
+            <input type="text" id="keyboard-input-display" class="keyboard-input-display"
+              placeholder="Tap keys below..." readonly>
             <div class="virtual-keyboard" id="onscreen-keyboard">
               <!-- Rendered via JS -->
             </div>
@@ -934,4 +889,5 @@
   <script src="approved-emails.js"></script>
   <script src="admin.js"></script>
 </body>
+
 </html>

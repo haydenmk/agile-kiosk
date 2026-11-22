@@ -477,13 +477,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const defaultContent = {
     flyers: [
-      { badge: "Featured Program", title: "Applied Business & Info Tech (ABIT)", lead: "Island tech starts here.", tag1: "4-Year Bachelor Degree", tag2: "100% On Maui", theme: "ocean" },
-      { badge: "Hospitality & Tourism", title: "Lead Maui's Premier Resorts & Tourism", lead: "Lead Maui's next great guest experience.", tag1: "Guaranteed Internships", tag2: "Direct Career Track", theme: "navy" },
-      { badge: "Student Event", title: "Fall Business Capstone & Pitch Day", lead: "Nov 12 · Ka Lama 102", tag1: "Ka Lama 102", tag2: "Free Refreshments", theme: "copper" },
-      { badge: "Career Opportunity", title: "Student Help & Lab Assistant Positions", lead: "Flexible campus work while you study.", tag1: "$16.50/hr", tag2: "Apply at Ka Lama 203", theme: "slate" },
-      { badge: "Advising & Registration", title: "Spring 2027 Registration Starts Soon", lead: "Spring 2027 planning starts soon.", tag1: "Walk-ins Welcome", tag2: "Ka Lama 2nd Floor", theme: "lagoon" }
-    ],
-    today: [
+      { badge: "Welcome to UHMC", title: "University of Hawaiʻi Maui College", lead: "Ka Lama Building · Business Department", tag1: "Touch Screen to Begin", tag2: "", theme: "ocean", image: "assets/images/welcome_screen/UH Maui_Welcome.png" },
+      { badge: "Hands-On Learning", title: "Explore Programs & Degrees", lead: "ABIT · Accounting · Business · Hospitality", tag1: "Touch Screen to Begin", tag2: "", theme: "ocean", image: "assets/images/welcome_screen/UHMC_img_1.jpg" },
+      { badge: "Student Collaboration", title: "Interactive Campus & Directory", lead: "Find faculty, classrooms, labs & student resources", tag1: "Touch Screen to Begin", tag2: "", theme: "ocean", image: "assets/images/welcome_screen/UH Maui.jpg" },
+      { badge: "Campus Opportunities", title: "Careers, Internships & Events", lead: "Discover on-campus jobs & upcoming college events", tag1: "Touch Screen to Begin", tag2: "", theme: "ocean", image: "assets/images/welcome_screen/UH Maui (2).jpg" },
+      { badge: "Campus Life", title: "Join Our Community", lead: "Connecting island students to future careers", tag1: "Touch Screen to Begin", tag2: "", theme: "ocean", image: "assets/images/welcome_screen/55279649133_52bc572d25_k.jpg" },
+      { badge: "Ka Lama Information", title: "Student Advising & Resources", lead: "Visit advising and support services on the 2nd floor", tag1: "Touch Screen to Begin", tag2: "", theme: "ocean", image: "assets/images/welcome_screen/55279910055_e8931d2884_k.jpg" }
+    ],    today: [
       { time: "9:00 AM", title: "BUS 120: Principles of Management", sub: "Ka Lama 101 Lecture Hall" },
       { time: "11:30 AM", title: "HOST Industry Guest Speaker & Lunch", sub: "Ka Lama 102 Active Learning Lab" },
       { time: "2:00 PM", title: "ABIT Open Cyber Lab & Mentoring", sub: "Ka Lama 202 Technology Hub" }
@@ -516,12 +516,12 @@ document.addEventListener('DOMContentLoaded', () => {
     programs: defaultPrograms,
     contacts: defaultContacts,
     menuTiles: [
-      { id: "programs", type: "view", view: "view-programs", title: "Business Programs", subtitle: "Business · Hospitality · Accounting · ABIT", icon: "book", body: "", hidden: false },
-      { id: "directory", type: "view", view: "view-directory", title: "Building Directory", subtitle: "Rooms and offices, floors 1–2", icon: "layout", body: "", hidden: false },
-      { id: "jobs", type: "view", view: "view-jobs", title: "Job Opportunities", subtitle: "Business jobs and internships", icon: "briefcase", body: "", hidden: false },
-      { id: "events", type: "view", view: "view-events", title: "Events & News", subtitle: "Events, marketing, special occasions", icon: "calendar", body: "", hidden: false },
-      { id: "survey", type: "view", view: "view-survey", title: "Student Survey", subtitle: "Share your ideas for campus", icon: "clipboard", body: "", hidden: false },
-      { id: "website", type: "view", view: "view-website", title: "UHMC Website", subtitle: "Browse maui.hawaii.edu", icon: "globe", body: "", hidden: false }
+      { id: "programs", type: "view", view: "view-programs", title: "Business Programs", subtitle: "Business · Hospitality · Accounting · ABIT", icon: "book", body: "", hidden: false, image: "assets/images/main_screen/Screenshot 2026-11-12 092038.png" },
+      { id: "directory", type: "view", view: "view-directory", title: "Building Directory", subtitle: "Rooms and offices, floors 1–2", icon: "layout", body: "", hidden: false, image: "assets/images/main_screen/Screenshot 2026-11-12 092032.png" },
+      { id: "jobs", type: "view", view: "view-jobs", title: "Job Opportunities", subtitle: "Business jobs and internships", icon: "briefcase", body: "", hidden: false, image: "assets/images/main_screen/Screenshot 2026-11-12 092103.png" },
+      { id: "events", type: "view", view: "view-events", title: "Events & News", subtitle: "Events, marketing, special occasions", icon: "calendar", body: "", hidden: false, image: "assets/images/main_screen/Screenshot 2026-11-12 092057.png" },
+      { id: "survey", type: "view", view: "view-survey", title: "Student Survey", subtitle: "Share your ideas for campus", icon: "clipboard", body: "", hidden: false, image: "assets/images/main_screen/Screenshot 2026-11-12 092052.png" },
+      { id: "website", type: "view", view: "view-website", title: "UHMC Website", subtitle: "Browse maui.hawaii.edu", icon: "globe", body: "", hidden: false, image: "assets/images/main_screen/Screenshot 2026-11-12 092045.png" }
     ],
     attractWidgets: [
       { id: "slideshow", visible: true },
@@ -1562,12 +1562,13 @@ document.addEventListener('DOMContentLoaded', () => {
     slideIndex = 0;
     track.innerHTML = content.flyers.map((flyer, i) => {
       const theme = KioskStore.FLYER_THEMES[flyer.theme] || KioskStore.FLYER_THEMES.ocean;
+      const background = flyer.image ? `url('${flyer.image}')` : theme.css;
       const tags = [flyer.tag1, flyer.tag2]
         .filter(Boolean)
         .map(tag => `<span class="tag-gold">${esc(tag)}</span>`)
         .join('');
       return `
-        <div class="flyer-slide ${i === 0 ? 'active' : ''}" style="--flyer-bg: ${theme.css};">
+        <div class="flyer-slide ${i === 0 ? 'active' : ''}" style="--flyer-bg: ${esc(background)};">
           <div class="flyer-overlay"></div>
           <div class="flyer-badge">${esc(flyer.badge)}</div>
           <div class="flyer-body">
@@ -1643,11 +1644,10 @@ document.addEventListener('DOMContentLoaded', () => {
     grid.innerHTML = content.menuTiles
       .filter(tile => !tile.hidden)
       .map(tile => `
-        <button class="menu-tile menu-tile-${esc(tile.id)}" data-view="${esc(tile.view)}" data-tile-id="${esc(tile.id)}">
-          <div class="tile-icon-circle">${KioskStore.iconSvg(tile.icon, 34)}</div>
+        <button class="menu-tile menu-tile-${esc(tile.id)}" data-view="${esc(tile.view)}" data-tile-id="${esc(tile.id)}"
+          style="background-image: ${tile.image ? esc(`url('${tile.image}')`) : 'none'};">
           <div class="tile-text">
             <h3>${esc(tile.title)}</h3>
-            <p>${esc(tile.subtitle)}</p>
           </div>
         </button>
       `).join('');

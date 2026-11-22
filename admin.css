@@ -178,7 +178,7 @@
 }
 
 .adm-tab {
-  flex: 1 1 calc(25% - 6px); /* 7 tabs wrap as 4 + 3 */
+  flex: 1 1 calc(33% - 6px); /* 6 tabs wrap as 3 + 3 */
   min-height: 44px;
   padding: 0 14px;
   border-radius: var(--radius-md);
@@ -561,3 +561,117 @@ textarea.adm-input {
   padding-left: 8px;
   padding-right: 4px;
 }
+
+/* ------------------------------------------------------------ photo picker */
+.adm-photo-preview {
+  width: 100%;
+  height: 120px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid #b9cbd6;
+  background-color: var(--uhmc-primary-dark, #00313c);
+  background-size: cover;
+  background-position: center;
+}
+
+.adm-photo-preview.empty {
+  background-image: repeating-linear-gradient(45deg, #e6eff4, #e6eff4 10px, #f3f9fc 10px, #f3f9fc 20px) !important;
+}
+
+/* ==========================================================================
+   Theme alignment with the kiosk frontend (header, cards, pills, keyboard)
+   ========================================================================== */
+.adm-overlay {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(0, 108, 150, 0.10) 0%, transparent 45%),
+    radial-gradient(circle at 90% 92%, rgba(255, 182, 0, 0.14) 0%, transparent 45%),
+    var(--bg-dark);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* Header looks like the kiosk header: blue bar, gold-outlined UHMC badge */
+.adm-panel-head {
+  background: rgba(0, 79, 110, 0.97);
+  border-bottom: 1px solid var(--surface-border);
+  box-shadow: 0 4px 14px rgba(0, 49, 60, 0.25);
+}
+
+.adm-panel-head .adm-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.adm-panel-head .adm-title::before {
+  content: 'UHMC';
+  background: var(--uh-green-primary);
+  border: 1.5px solid var(--uh-gold);
+  border-radius: var(--radius-sm);
+  padding: 5px 11px;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+/* Tabs: rounded pills, gold highlight like the kiosk's filter chips */
+.adm-tabs {
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid var(--surface-border-subtle);
+}
+
+.adm-tab {
+  border-radius: var(--radius-full);
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.adm-tab.active {
+  background: var(--uhmc-primary);
+  border-color: var(--uh-gold);
+  box-shadow: 0 0 0 2px rgba(255, 182, 0, 0.45);
+}
+
+/* Cards: white surface, soft blue-tinted shadow */
+.adm-section {
+  background: var(--surface-card);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 24px -12px rgba(0, 49, 60, 0.35);
+}
+
+.adm-h3 {
+  font-size: 20px;
+  letter-spacing: -0.2px;
+}
+
+.adm-card { border-radius: var(--radius-lg); }
+.adm-card-head { background: rgba(0, 79, 110, 0.08); }
+
+.adm-btn,
+.adm-icon-btn,
+.adm-pill { border-radius: var(--radius-full); }
+
+.adm-btn.primary {
+  border-color: var(--uh-gold);
+  box-shadow: 0 0 0 2px rgba(255, 182, 0, 0.35);
+}
+
+.adm-pill.active { box-shadow: 0 0 0 2px rgba(255, 182, 0, 0.35); }
+
+.adm-cal-day.selected { box-shadow: 0 0 0 2px var(--uh-gold); }
+.adm-cal-month { font-size: 20px; }
+
+.adm-photo-preview.empty { box-shadow: none; }
+
+.adm-photo-preview {
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 -40px 40px -20px rgba(0, 20, 30, 0.55);
+}
+
+/* Keyboard dock matches the kiosk's deep-navy footer */
+.adm-kbd {
+  background: var(--uhmc-navy);
+  border-top-color: var(--uh-gold);
+}
+
+.adm-key { background: rgba(0, 108, 150, 0.55); }

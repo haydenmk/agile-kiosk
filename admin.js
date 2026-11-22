@@ -26,20 +26,12 @@
 
   const TABS = [
     { id: 'events', label: 'Events' },
-    { id: 'flyers', label: 'Flyers' },
-    { id: 'ticker', label: 'News bar' },
-    { id: 'classes', label: 'Classes' },
+    { id: 'flyers', label: 'Slideshow' },
+    { id: 'classes', label: 'Programs' },
     { id: 'people', label: 'People' },
     { id: 'layout', label: 'Layout' },
     { id: 'backup', label: 'Backup' }
   ];
-
-  const ATTRACT_WIDGET_LABELS = {
-    slideshow: 'Flyer slideshow',
-    today: 'Today in Ka Lama (class schedule)',
-    job: 'Featured job card',
-    ticker: 'News bar (scrolling text)'
-  };
 
   const KEYBOARD_ROWS = [
     ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '⌫'],
@@ -273,12 +265,6 @@
   // ------------------------------------------------------------------ tabs
   function eventsTab() {
     return h('div', null,
-      section('Featured announcement', 'The gold banner at the top of the Main Menu.',
-        checkField('Show this banner on the Main Menu', draft, 'menuBannerVisible'),
-        textField('Badge', draft.banner, 'badge'),
-        textField('Headline', draft.banner, 'title'),
-        textField('Details', draft.banner, 'body', { multiline: true })),
-
       section('Featured event', 'The large event card at the top of the Events & News page.',
         textField('Flyer badge', draft.featuredEvent, 'artBadge'),
         textField('Flyer title', draft.featuredEvent, 'artTitle'),
@@ -483,36 +469,48 @@
       h('div', { class: 'adm-msg' }));
   }
 
+  // Photo chooser: pick one of the kiosk's built-in photos, or type a path / web address.
+  function imageField(label, obj, key, redraw) {
+    const options = [{ value: '', label: '(none)' }]
+      .concat(KioskStore.IMAGES.map(img => ({ value: img.path, label: img.label })));
+    const preview = h('div', { class: 'adm-photo-preview' });
+    const paint = () => {
+      preview.style.backgroundImage = obj[key] ? `url("${String(obj[key]).replace(/"/g, '%22')}")` : 'none';
+      preview.classList.toggle('empty', !obj[key]);
+    };
+    paint();
+    return h('div', { class: 'adm-field' },
+      h('span', { class: 'adm-label', text: label }),
+      preview,
+      selectField('Choose a built-in photo', options, () => obj[key] || '', v => { obj[key] = v; },
+        { onChange: () => redraw() }),
+      textField('Or photo path / web address', obj, key, {
+        placeholder: 'assets/images/welcome_screen/photo.jpg',
+        onInput: paint
+      }));
+  }
+
   function flyersTab() {
     const themeOptions = Object.entries(KioskStore.FLYER_THEMES).map(([value, theme]) => ({ value, label: theme.label }));
     return h('div', null,
-      section('Attract-screen flyers', 'These rotate in the big slideshow on the idle screen (up to 8).',
+      section('Welcome-screen slideshow', 'These photo slides rotate full-screen on the idle screen (up to 8).',
         listEditor(draft.flyers, {
           max: 8,
           titleOf: f => f.title,
-          renderItem: (f, i, refresh) => [
+          renderItem: (f, i, refresh, redraw) => [
+            imageField('Photo', f, 'image', redraw),
             textField('Badge (small label)', f, 'badge'),
             textField('Title', f, 'title', { onInput: refresh }),
             textField('Tagline', f, 'lead'),
             row(
               textField('Gold tag 1', f, 'tag1', { grow: true }),
               textField('Gold tag 2', f, 'tag2', { grow: true })),
-            selectField('Background color', themeOptions, () => f.theme, v => { f.theme = v; })
+            selectField('Background color (used when there is no photo)', themeOptions, () => f.theme, v => { f.theme = v; })
           ],
           adds: [{
-            label: '+ Add flyer',
-            make: () => ({ badge: 'Announcement', title: 'New flyer', lead: '', tag1: '', tag2: '', theme: 'ocean' })
+            label: '+ Add slide',
+            make: () => ({ badge: 'Announcement', title: 'New slide', lead: '', tag1: 'Touch Screen to Begin', tag2: '', theme: 'ocean', image: '' })
           }]
-        })));
-  }
-
-  function tickerTab() {
-    return h('div', null,
-      section('News bar', 'The scrolling text along the bottom of the attract screen. Messages scroll in this order.',
-        listEditor(draft.ticker, {
-          titleOf: message => truncate(message, 44),
-          renderItem: (message, i, refresh) => textField('Message', draft.ticker, i, { onInput: refresh, multiline: true, rows: 2 }),
-          adds: [{ label: '+ Add message', make: () => 'New message' }]
         })));
   }
 
@@ -530,18 +528,6 @@
       })));
 
     return h('div', null,
-      section('Today in Ka Lama', 'The class / event schedule card on the attract screen.',
-        listEditor(draft.today, {
-          titleOf: item => `${item.time} · ${item.title}`,
-          renderItem: (item, i, refresh) => [
-            row(
-              textField('Time', item, 'time', { onInput: refresh, grow: true }),
-              textField('Room / place', item, 'sub', { grow: true })),
-            textField('Class or event name', item, 'title', { onInput: refresh })
-          ],
-          adds: [{ label: '+ Add class', make: () => ({ time: '', title: 'New class', sub: '' }) }]
-        })),
-
       section('Programs & degrees', 'Pick a program, then edit what students see on the Business Programs screen. (Advisor names and emails are on the People tab.)',
         programButtons,
         textField('Program title', prog, 'title'),
@@ -610,7 +596,6 @@
   function layoutTab() {
     const screenOptions = KioskStore.VIEWS.map(v => ({ value: v.id, label: v.label }))
       .concat([{ value: 'custom', label: 'Custom info page (you write the text)' }]);
-    const iconOptions = Object.entries(KioskStore.ICONS).map(([value, icon]) => ({ value, label: icon.label }));
 
     const unusedView = () => {
       const used = new Set(draft.menuTiles.filter(t => t.type === 'view').map(t => t.view));
@@ -625,8 +610,7 @@
           renderItem: (t, i, refresh, redraw) => [
             checkField('Show on the Main Menu', t, 'hidden', { invert: true }),
             textField('Tile title', t, 'title', { onInput: refresh }),
-            textField('Small text under the title', t, 'subtitle'),
-            selectField('Icon', iconOptions, () => t.icon, v => { t.icon = v; }),
+            imageField('Tile photo', t, 'image', redraw),
             selectField('Opens', screenOptions,
               () => (t.type === 'custom' ? 'custom' : t.view),
               v => {
@@ -643,26 +627,15 @@
               label: '+ Add screen shortcut',
               make: () => {
                 const view = unusedView();
-                return { id: KioskStore.uniqueId('tile'), type: 'view', view: view.id, title: view.label, subtitle: '', icon: 'info', body: '', hidden: false };
+                return { id: KioskStore.uniqueId('tile'), type: 'view', view: view.id, title: view.label, subtitle: '', icon: 'info', body: '', hidden: false, image: '' };
               }
             },
             {
               label: '+ Add info page',
-              make: () => ({ id: KioskStore.uniqueId('tile'), type: 'custom', view: 'view-custom', title: 'New page', subtitle: 'Tap to read more', icon: 'info', body: 'Write your information here.', hidden: false })
+              make: () => ({ id: KioskStore.uniqueId('tile'), type: 'custom', view: 'view-custom', title: 'New page', subtitle: 'Tap to read more', icon: 'info', body: 'Write your information here.', hidden: false, image: '' })
             }
           ]
-        })),
-
-      section('Attract screen widgets', "Show, hide and reorder the cards on the idle screen. The \"Touch anywhere to begin\" bar always stays at the bottom.",
-        listEditor(draft.attractWidgets, {
-          removable: false,
-          titleOf: w => ATTRACT_WIDGET_LABELS[w.id] || w.id,
-          renderItem: w => checkField('Show on the attract screen', w, 'visible')
-        })),
-
-      section('Main Menu banner', null,
-        checkField('Show the featured announcement banner', draft, 'menuBannerVisible'),
-        h('p', { class: 'adm-hint', text: 'Edit the banner text on the Events tab.' })));
+        })));
   }
 
   function backupTab() {
@@ -729,7 +702,7 @@
   function renderBody(message) {
     bodyEl.replaceChildren();
     const builders = {
-      events: eventsTab, flyers: flyersTab, ticker: tickerTab,
+      events: eventsTab, flyers: flyersTab,
       classes: classesTab, people: peopleTab, layout: layoutTab, backup: backupTab
     };
     bodyEl.append(builders[activeTab]());

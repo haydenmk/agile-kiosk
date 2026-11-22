@@ -31,17 +31,18 @@ Staff can update kiosk content right on the touchscreen.
 
 | Tab | What you can edit |
 | :--- | :--- |
-| **Events** | Main Menu announcement banner, the featured event card, and an **event calendar**: tap a day, add events with name, info, date, start/end time (or all day), building and room. Several events can share the same day and time |
-| **Flyers** | Attract-screen flyer slideshow (add, remove, reorder, change colors) |
-| **News bar** | The scrolling text at the bottom of the attract screen |
-| **Classes** | "Today in Ka Lama" schedule, plus each program's description, degrees and career paths |
+| **Events** | The featured event card, and an **event calendar**: tap a day, add events with name, info, date, start/end time (or all day), building and room. Several events can share the same day and time |
+| **Slideshow** | The full-screen photo slides on the welcome screen: choose a photo, badge, title, tagline and gold tag (add, remove, reorder) |
+| **Programs** | Each program's description, degrees and career paths |
 | **People** | Program advisor names/emails and directory contacts (name + email per room) |
-| **Layout** | Add, remove, hide and reorder Main Menu tiles (including custom info pages), and show/hide/reorder attract-screen cards |
+| **Layout** | Add, remove, hide and reorder Main Menu tiles, change each tile's photo, and create custom info pages |
 | **Backup** | Download / restore a backup file, or reset to defaults |
 
 The Events & News page is driven by the calendar dates: **This Week** shows today through the next 6 days, **This Month** shows the rest of the current month, and **Special Occasions** shows upcoming events marked as special. Past events are hidden automatically. The sample events that ship with the kiosk are placed relative to today as placeholders.
 
 Changes appear on the kiosk immediately. The panel signs itself out after 5 minutes without a touch.
+
+**Photos:** the slideshow and tile editors list the photos in `assets/images/`. To offer a new photo, add the file to that folder on GitHub and add one line for it to the `IMAGES` list in `content-store.js` (you can also type any `assets/...` path or web address directly).
 
 ### Where edits are saved (important)
 

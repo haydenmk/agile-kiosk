@@ -25,6 +25,34 @@
     { id: 'view-website', label: 'UHMC Website' }
   ];
 
+  // Photos that ship with the kiosk (admin photo pickers list these).
+  // To offer a new photo, add its file to assets/images/ and add it here.
+  const IMAGES = [
+    { label: 'Welcome: UH Maui', path: 'assets/images/welcome_screen/UH Maui_Welcome.png' },
+    { label: 'Welcome: Campus 1', path: 'assets/images/welcome_screen/UHMC_img_1.jpg' },
+    { label: 'Welcome: UH Maui', path: 'assets/images/welcome_screen/UH Maui.jpg' },
+    { label: 'Welcome: UH Maui (2)', path: 'assets/images/welcome_screen/UH Maui (2).jpg' },
+    { label: 'Welcome: Campus life', path: 'assets/images/welcome_screen/55279649133_52bc572d25_k.jpg' },
+    { label: 'Welcome: Student resources', path: 'assets/images/welcome_screen/55279910055_e8931d2884_k.jpg' },
+    { label: 'Tile: Programs', path: 'assets/images/main_screen/Screenshot 2026-11-12 092038.png' },
+    { label: 'Tile: Directory', path: 'assets/images/main_screen/Screenshot 2026-11-12 092032.png' },
+    { label: 'Tile: Jobs', path: 'assets/images/main_screen/Screenshot 2026-11-12 092103.png' },
+    { label: 'Tile: Events', path: 'assets/images/main_screen/Screenshot 2026-11-12 092057.png' },
+    { label: 'Tile: Survey', path: 'assets/images/main_screen/Screenshot 2026-11-12 092052.png' },
+    { label: 'Tile: Website', path: 'assets/images/main_screen/Screenshot 2026-11-12 092045.png' }
+  ];
+
+  // An image path is kept only if it points inside this site (assets/...) or at
+  // an http(s) address, and has no characters that could break out of CSS url('...').
+  function cleanImage(value) {
+    const path = str(value).trim();
+    if (!path) return '';
+    if (/[\\'"<>\u0000-\u001f]/.test(path)) return '';
+    if (/^assets\/[^:]+$/.test(path) && !path.includes('..')) return path;
+    if (/^https?:\/\/[^\s]+$/i.test(path)) return path;
+    return '';
+  }
+
   // Background gradients for attract-screen flyers.
   const FLYER_THEMES = {
     ocean:  { label: 'Ocean blue', css: 'linear-gradient(145deg, #004f6e 0%, #002530 100%)' },
@@ -287,9 +315,9 @@
     const out = {};
 
     // Flyers
-    const flyers = cleanList(src.flyers, { badge: '', title: '', lead: '', tag1: '', tag2: '', theme: 'ocean' });
+    const flyers = cleanList(src.flyers, { badge: '', title: '', lead: '', tag1: '', tag2: '', theme: 'ocean', image: '' });
     out.flyers = flyers
-      ? flyers.map(f => Object.assign(f, { theme: FLYER_THEMES[f.theme] ? f.theme : 'ocean' }))
+      ? flyers.map(f => Object.assign(f, { theme: FLYER_THEMES[f.theme] ? f.theme : 'ocean', image: cleanImage(f.image) }))
       : clone(defaults.flyers);
 
     // Today in Ka Lama schedule
@@ -341,14 +369,18 @@
     // Main-menu tiles
     const validViews = new Set(VIEWS.map(v => v.id));
     const tiles = cleanList(src.menuTiles, {
-      id: '', type: 'view', view: 'view-programs', title: '', subtitle: '', icon: 'info', body: '', hidden: false
+      id: '', type: 'view', view: 'view-programs', title: '', subtitle: '', icon: 'info', body: '', hidden: false, image: null
     });
+    const defaultTileImage = {};
+    (defaults.menuTiles || []).forEach(t => { defaultTileImage[t.id] = t.image || ''; });
     if (tiles) {
       const seen = new Set();
       out.menuTiles = tiles
         .map(t => {
           t.type = t.type === 'custom' ? 'custom' : 'view';
           t.icon = ICONS[t.icon] ? t.icon : 'info';
+          // Tiles saved before photos existed get their default photo back
+          t.image = t.image === null ? (defaultTileImage[t.id] || '') : cleanImage(t.image);
           t.view = t.type === 'custom' ? 'view-custom' : t.view;
           if (!t.id || seen.has(t.id)) t.id = uniqueId('tile');
           seen.add(t.id);
@@ -451,6 +483,7 @@
     ATTRACT_WIDGET_IDS,
     EVENT_FILTERS,
     MONTH_NAMES,
+    IMAGES,
     clone,
     uniqueId,
     isoDate,
