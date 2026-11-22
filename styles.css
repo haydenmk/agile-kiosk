@@ -1,43 +1,60 @@
-/* ==========================================================================
-   UHMC Business Department — Ka Lama Interactive Kiosk Stylesheet
+﻿/* ==========================================================================
+   UHMC Business Department â€” Ka Lama Interactive Kiosk Stylesheet
    Faithfully recreating all 8 wireframes from UHMC Kiosk Lo-Fi Wireframes.pdf
    with premium UHMC brand aesthetics and portrait 9:16 kiosk framing.
    ========================================================================== */
 
 :root {
   /* UHMC Official Brand Palette (colors/UHMC Brand Colors.pdf) */
-  /* Primary Brand Color — Pantone 3025 C */
-  --uhmc-primary: #004f6e;          /* C:100 M:65 Y:37 K:21 | R:0 G:79 B:110 */
+  /* Primary Brand Color â€” Pantone 3025 C */
+  --uhmc-primary: #004f6e;
+  /* C:100 M:65 Y:37 K:21 | R:0 G:79 B:110 */
   --uhmc-primary-light: #006c96;
   --uhmc-primary-dark: #003a52;
 
   /* Secondary Neutrals */
-  --uhmc-navy: #00313c;             /* Pantone 547 C | C:100 M:35 Y:32 K:82 | R:0 G:49 B:60 */
-  --uhmc-slate: #65665c;            /* Pantone 417 C | C:33 M:23 Y:35 K:63 | R:101 G:102 B:92 */
-  --uhmc-sage: #afa96e;             /* Pantone 5845 C | C:18 M:10 Y:60 K:23 | R:175 G:169 B:110 */
-  --uhmc-warm-gray: #aca39a;        /* Pantone Warm Gray 5C | C:11 M:13 Y:16 K:32 | R:172 G:163 B:154 */
+  --uhmc-navy: #00313c;
+  /* Pantone 547 C | C:100 M:35 Y:32 K:82 | R:0 G:49 B:60 */
+  --uhmc-slate: #65665c;
+  /* Pantone 417 C | C:33 M:23 Y:35 K:63 | R:101 G:102 B:92 */
+  --uhmc-sage: #afa96e;
+  /* Pantone 5845 C | C:18 M:10 Y:60 K:23 | R:175 G:169 B:110 */
+  --uhmc-warm-gray: #aca39a;
+  /* Pantone Warm Gray 5C | C:11 M:13 Y:16 K:32 | R:172 G:163 B:154 */
 
   /* Third Level Accents */
-  --uhmc-gold: #ffb600;             /* Pantone 7549 C | C:0 M:31 Y:100 K:0 | R:255 G:182 B:0 */
+  --uhmc-gold: #ffb600;
+  /* Pantone 7549 C | C:0 M:31 Y:100 K:0 | R:255 G:182 B:0 */
   --uhmc-gold-light: #ffc933;
-  --uhmc-amber: #dd8a03;            /* Pantone 7564 | C:12 M:51 Y:100 K:1 | R:221 G:138 B:3 */
-  --uhmc-green: #789904;            /* Pantone 377 C | C:58 M:22 Y:100 K:4 | R:120 G:153 B:4 */
-  --uhmc-coral: #e63f51;            /* Pantone 4058 C | C:4 M:90 Y:64 K:0 | R:230 G:63 B:81 */
+  --uhmc-amber: #dd8a03;
+  /* Pantone 7564 | C:12 M:51 Y:100 K:1 | R:221 G:138 B:3 */
+  --uhmc-green: #789904;
+  /* Pantone 377 C | C:58 M:22 Y:100 K:4 | R:120 G:153 B:4 */
+  --uhmc-coral: #e63f51;
+  /* Pantone 4058 C | C:4 M:90 Y:64 K:0 | R:230 G:63 B:81 */
 
   /* System Color Aliases (maintaining semantic and backward compatibility) */
-  --uh-green-deep: #00313c;         /* Deep neutral Pantone 547 C */
-  --uh-green-primary: #004f6e;      /* UHMC Primary Pantone 3025 C */
-  --uh-green-mid: #006085;          /* UHMC Mid Blue */
-  --uh-green-light: #0076a4;        /* UHMC Bright Blue */
-  --uh-gold: #ffb600;               /* UHMC Gold Pantone 7549 C */
-  --uh-gold-light: #ffc933;         /* UHMC Gold Light Highlight */
+  --uh-green-deep: #00313c;
+  /* Deep neutral Pantone 547 C */
+  --uh-green-primary: #004f6e;
+  /* UHMC Primary Pantone 3025 C */
+  --uh-green-mid: #006085;
+  /* UHMC Mid Blue */
+  --uh-green-light: #0076a4;
+  /* UHMC Bright Blue */
+  --uh-gold: #ffb600;
+  /* UHMC Gold Pantone 7549 C */
+  --uh-gold-light: #ffc933;
+  /* UHMC Gold Light Highlight */
   --uh-gold-pale: rgba(255, 182, 0, 0.15);
   --uh-teal: #004f6e;
 
   /* Surfaces & Neutrals tailored to UHMC Ocean Teal/Navy palette */
   --bg-dark: #f4f8fa;
-  --bg-light: #f4f8fa; /* Light background for white theme */
-  --bg-light-dim: #e0e5e9; /* Slightly dimmed light variant */
+  --bg-light: #f4f8fa;
+  /* Light background for white theme */
+  --bg-light-dim: #e0e5e9;
+  /* Slightly dimmed light variant */
   --bg-kiosk: #eaf1f6;
   --surface-card: rgba(255, 255, 255, 0.95);
   --surface-card-hover: rgba(235, 245, 252, 0.98);
@@ -47,8 +64,10 @@
   --surface-border-gold: rgba(255, 182, 0, 0.5);
 
   --text-primary: #002030;
-  --text-muted: #aca39a;            /* Pantone Warm Gray 5C */
-  --text-dim: #65665c;              /* Pantone 417 C */
+  --text-muted: #aca39a;
+  /* Pantone Warm Gray 5C */
+  --text-dim: #65665c;
+  /* Pantone 417 C */
   --text-dark: #00313c;
 
   /* Radii & Shadows */
@@ -79,7 +98,8 @@
   -webkit-touch-callout: none;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -205,8 +225,8 @@ body.kiosk-full-mode #kiosk-app {
   flex-direction: column;
   position: relative;
   background: radial-gradient(circle at 10% 10%, rgba(0, 79, 110, 0.45) 0%, transparent 50%),
-              radial-gradient(circle at 90% 90%, rgba(255, 182, 0, 0.15) 0%, transparent 45%),
-              var(--bg-dark);
+    radial-gradient(circle at 90% 90%, rgba(255, 182, 0, 0.15) 0%, transparent 45%),
+    var(--bg-dark);
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -335,9 +355,11 @@ body.kiosk-full-mode #kiosk-app {
 .view-panel::-webkit-scrollbar {
   width: 6px;
 }
+
 .view-panel::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .view-panel::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15);
   border-radius: 99px;
@@ -349,16 +371,16 @@ body.kiosk-full-mode #kiosk-app {
 .attract-container {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   height: 100%;
   cursor: pointer;
 }
 
-/* Slideshow Card (Flyers) */
+/* Slideshow Card (Flyers) - fills screen area above news ticker */
 .slideshow-card {
   position: relative;
-  height: 250px;
-  min-height: 250px;
+  flex: 1;
+  min-height: 0;
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--surface-border);
@@ -378,13 +400,13 @@ body.kiosk-full-mode #kiosk-app {
   background-image: var(--flyer-bg);
   background-size: cover;
   background-position: center;
-  padding: 24px;
+  padding: 32px 28px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   opacity: 0;
-  transform: scale(0.97);
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transform: scale(0.98);
+  transition: opacity 0.6s ease, transform 0.6s ease;
   z-index: 1;
 }
 
@@ -397,24 +419,25 @@ body.kiosk-full-mode #kiosk-app {
 .flyer-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0,49,60,0.05) 22%, rgba(0,31,43,0.88) 100%);
+  background: linear-gradient(180deg, rgba(0, 31, 43, 0.1) 0%, rgba(0, 31, 43, 0.35) 45%, rgba(0, 20, 30, 0.88) 100%);
   pointer-events: none;
 }
 
 .flyer-badge {
   position: absolute;
-  top: 16px;
-  left: 16px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid var(--uh-gold);
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 49, 60, 0.75);
+  border: 1.5px solid var(--uh-gold);
   color: var(--uh-gold-light);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  padding: 4px 10px;
+  letter-spacing: 1px;
+  padding: 6px 14px;
   border-radius: var(--radius-full);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   z-index: 3;
 }
 
@@ -425,56 +448,96 @@ body.kiosk-full-mode #kiosk-app {
 
 .flyer-body h2 {
   font-family: 'Outfit', sans-serif;
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 800;
-  line-height: 1.25;
+  line-height: 1.2;
   color: #ffffff;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
 .flyer-lead {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.95);
   line-height: 1.4;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 .flyer-meta-row {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .tag-gold {
-  background: rgba(255, 182, 0, 0.2);
-  border: 1px solid var(--uh-gold);
+  background: rgba(255, 182, 0, 0.25);
+  border: 1.5px solid var(--uh-gold);
   color: #ffffff;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(6px);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .slideshow-dots {
   position: absolute;
-  bottom: 12px;
-  right: 16px;
+  bottom: 20px;
+  right: 20px;
   display: flex;
-  gap: 6px;
+  gap: 8px;
   z-index: 4;
 }
 
 .slideshow-dots .dot {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.4);
   transition: all 0.3s;
 }
 
 .slideshow-dots .dot.active {
   background: var(--uh-gold);
-  width: 22px;
+  width: 26px;
   border-radius: 4px;
+}
+
+.slideshow-touch-prompt {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 79, 110, 0.85);
+  border: 1.5px solid var(--uh-gold);
+  color: #ffffff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  z-index: 4;
+  animation: prompt-pulse 2.2s infinite ease-in-out;
+}
+
+@keyframes prompt-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+    box-shadow: 0 0 16px rgba(255, 182, 0, 0.6);
+  }
 }
 
 /* Attract Cards (Today & Job) */
@@ -690,8 +753,13 @@ body.kiosk-full-mode #kiosk-app {
 }
 
 @keyframes ticker-slide {
-  0% { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-100%, 0, 0); }
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
 }
 
 /* Touch Begin Banner (Wireframe Bottom) */
@@ -725,8 +793,15 @@ body.kiosk-full-mode #kiosk-app {
 }
 
 @keyframes pulse-border {
-  0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(1.08); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1.08);
+    opacity: 0;
+  }
 }
 
 /* ==========================================================================
@@ -815,10 +890,13 @@ body.kiosk-full-mode #kiosk-app {
 
 .menu-tile {
   min-height: 132px;
-  background: linear-gradient(145deg, #004f6e 0%, #002530 100%);
+  position: relative;
+  background-color: var(--uhmc-primary-dark);
+  background-size: cover;
+  background-position: center;
   border: 1.5px solid var(--surface-border);
   border-radius: var(--radius-lg);
-  padding: 14px;
+  padding: 16px 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -826,18 +904,54 @@ body.kiosk-full-mode #kiosk-app {
   text-align: center;
   gap: 10px;
   box-shadow: var(--shadow-kiosk);
+  overflow: hidden;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  isolation: isolate;
 }
 
-.menu-tile:nth-child(2) { background: linear-gradient(145deg, #093758 0%, #031c2e 100%); }
-.menu-tile:nth-child(3) { background: linear-gradient(145deg, #5c2c16 0%, #2f1508 100%); }
-.menu-tile:nth-child(4) { background: linear-gradient(145deg, #2b3a42 0%, #151e23 100%); }
-.menu-tile:nth-child(5) { background: linear-gradient(145deg, #004f6e 0%, #00313c 100%); }
-.menu-tile:nth-child(6) { background: linear-gradient(145deg, #245b59 0%, #123436 100%); }
+/* Photo backgrounds for each of the 6 tiles using unused photos */
+.menu-tile-programs {
+  background-image: url('assets/images/main_screen/Screenshot 2026-11-12 092038.png');
+}
+
+.menu-tile-directory {
+  background-image: url('assets/images/main_screen/Screenshot 2026-11-12 092032.png');
+}
+
+.menu-tile-jobs {
+  background-image: url('assets/images/main_screen/Screenshot 2026-11-12 092103.png');
+}
+
+.menu-tile-events {
+  background-image: url('assets/images/main_screen/Screenshot 2026-11-12 092057.png');
+}
+
+.menu-tile-survey {
+  background-image: url('assets/images/main_screen/Screenshot 2026-11-12 092052.png');
+}
+
+.menu-tile-website {
+  background-image: url('assets/images/main_screen/Screenshot 2026-11-12 092045.png');
+}
+
+/* Brand blue tint overlay so tile text and photos look balanced */
+.menu-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 20, 30, 0.50) 0%, rgba(0, 10, 20, 0.72) 100%);
+  z-index: 1;
+  transition: background 0.25s ease;
+}
+
+.menu-tile:hover::before {
+  background: linear-gradient(180deg, rgba(0, 20, 30, 0.74) 0%, rgba(0, 10, 20, 0.90) 100%);
+}
 
 .menu-tile:hover {
   border-color: var(--uh-gold);
   transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
 }
 
 .menu-tile:active {
@@ -846,31 +960,29 @@ body.kiosk-full-mode #kiosk-app {
   border-color: var(--uh-gold-light);
 }
 
-.tile-icon-circle {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: rgba(0, 79, 110, 0.12);
-  border: 1.5px solid var(--surface-border-gold);
+
+.menu-tile>* {
+  position: relative;
+  z-index: 2;
+}
+
+
+.tile-text {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--uh-gold-light);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
 .tile-text h3 {
   font-family: 'Outfit', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
   color: #ffffff;
-  margin-bottom: 2px;
-}
-
-.tile-text p {
-  font-size: 11px;
-  color: var(--text-muted);
-  line-height: 1.3;
+  margin-bottom: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+  padding: 8px 12px;
 }
 
 /* ==========================================================================
@@ -1124,7 +1236,7 @@ body.kiosk-full-mode #kiosk-app {
 
 .floor-pill-btn.active {
   background: var(--bg-light);
-  color: #ffffff;
+  color: #000000;
   border-color: var(--uh-gold);
   box-shadow: 0 0 16px rgba(255, 182, 0, 0.25);
 }
@@ -1446,7 +1558,7 @@ body.kiosk-full-mode #kiosk-app {
 .prog-tab-btn.active {
   background: var(--bg-light);
   border-color: var(--uh-gold);
-  color: #ffffff;
+  color: #1a1a1a;
   box-shadow: 0 0 16px rgba(255, 182, 0, 0.25);
 }
 
@@ -2479,7 +2591,7 @@ body.kiosk-full-mode #kiosk-app {
 }
 
 /* ==========================================================================
-   GLOBAL FOOTER (Present on Screens 2–8 per wireframes)
+   GLOBAL FOOTER (Present on Screens 2â€“8 per wireframes)
    ========================================================================== */
 .kiosk-footer {
   height: var(--footer-height);
