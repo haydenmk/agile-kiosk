@@ -44,7 +44,6 @@
   // ------------------------------------------------------------------ state
   let overlay, loginBox, panelBox, panelHeader, tabBar, bodyEl, statusEl, kbdDock, kbdToggleBtn;
   let emailInput, passwordInput, loginErrorEl, loginNoteEl, submitBtn, loginHintEl;
-  let extrasRow;
   let session = null;          // { email } while someone is signed in
   let draft = null;            // working copy of the content being edited
   let activeTab = 'events';
@@ -271,7 +270,6 @@
   function cloudErrorText(err, saving) {
     const code = (err && err.code) || '';
     if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found' || code === 'auth/invalid-email') return 'Email or password is incorrect.';
-    if (code === 'auth/email-already-in-use') return 'An account with that email already exists. Sign in, or tap Forgot password.';
     if (code === 'auth/weak-password') return 'Choose a longer password (at least 8 characters).';
     if (code === 'auth/too-many-requests') return 'Too many attempts. Please wait a few minutes and try again.';
     if (code === 'auth/operation-not-allowed') return 'Email/password sign-in is not turned on in Firebase (Authentication → Sign-in method).';
@@ -910,7 +908,6 @@
   // ---- online accounts: email + password (Firebase)
   function refreshLoginUI() {
     const online = cloudOn();
-    extrasRow.hidden = !online;
     passwordInput.placeholder = online ? 'Your password' : 'Admin password';
     loginHintEl.textContent = online
       ? 'Sign in with your approved staff email and your password.'
@@ -961,20 +958,6 @@
       showLoginError(cloudErrorText(err, false));
     } finally {
       submitBtn.disabled = false;
-    }
-  }
-
-  async function forgotPassword() {
-    const email = emailInput.value.trim().toLowerCase();
-    loginErrorEl.textContent = '';
-    loginNoteEl.textContent = '';
-    if (!EMAIL_RE.test(email)) { showLoginError('Type your email above first, then tap Forgot password.'); return; }
-    if (!onApprovedList(email)) { showLoginError('That email is not on the approved list.'); return; }
-    try {
-      await window.KioskCloud.resetPassword(email);
-      loginNoteEl.textContent = `If an account exists for ${email}, we sent a password-reset link. Check your inbox and spam.`;
-    } catch (err) {
-      showLoginError(cloudErrorText(err, false));
     }
   }
 
@@ -1075,21 +1058,12 @@
     submitBtn = button('Sign in', attemptLogin, 'primary');
     submitBtn.id = 'adm-submit';
     const actions = h('div', { class: 'adm-login-actions' }, button('Cancel', () => closeAdmin(), 'ghost'), submitBtn);
-    const extra = (label, act, fn) => {
-      const b = button(label, fn, 'ghost small');
-      b.dataset.act = act;
-      return b;
-    };
-    extrasRow = h('div', { class: 'adm-add-row adm-login-extras' },
-      extra('Forgot password?', 'reset', forgotPassword));
-    extrasRow.hidden = true;
-
     loginBox = h('div', { class: 'adm-login' },
       h('h2', { class: 'adm-title', text: 'Admin sign-in' }),
       loginHintEl,
       emailLabel, pwField,
       loginErrorEl, loginNoteEl,
-      actions, extrasRow);
+      actions);
 
     panelBox = h('div', { class: 'adm-panel' });
     panelBox.hidden = true;

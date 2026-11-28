@@ -47,9 +47,6 @@ async function start() {
       const cred = await authMod.signInWithEmailAndPassword(auth, email, password);
       return { email: cred.user.email || '' };
     },
-    resetPassword(email) {
-      return authMod.sendPasswordResetEmail(auth, email);
-    },
     signOut() {
       return authMod.signOut(auth).catch(() => {});
     },
