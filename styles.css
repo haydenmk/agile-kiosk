@@ -1525,7 +1525,6 @@ body.kiosk-full-mode #kiosk-app {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-top: auto;
 }
 
 .picker-label {
@@ -2945,4 +2944,9 @@ body.xlarge-text {
 
 body.ada-reach #kiosk-app {
   justify-content: flex-end;
+}
+
+/* Program selector now sits at the top, over the header's gradient: keep its label readable */
+.program-picker-area .picker-label {
+  color: var(--uhmc-navy);
 }
