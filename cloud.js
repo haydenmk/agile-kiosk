@@ -3,8 +3,9 @@
  *
  *  - Every kiosk reads the shared content from Firestore document kiosk/content
  *    and redraws itself whenever it changes (no sign-in needed to read).
- *  - The admin panel signs in with Google and writes edits to that document.
- *    Firestore rules (see README) accept writes only from approved emails.
+ *  - The admin panel signs in with an email + password account (created by you in
+ *    the Firebase console) and writes edits to that document. Firestore rules
+ *    (see README) accept writes only from those accounts.
  *
  * If firebase-config.js is missing, or Firebase cannot be reached, this file
  * does nothing and the kiosk keeps working from the copy saved in the browser.
@@ -31,6 +32,8 @@ async function start() {
 
   const app = appMod.initializeApp(config);
   const auth = authMod.getAuth(app);
+  // Sign-in lasts only for this tab/session, never beyond it
+  await authMod.setPersistence(auth, authMod.browserSessionPersistence).catch(() => {});
   const db = fsMod.getFirestore(app);
   const contentRef = fsMod.doc(db, DOC_PATH[0], DOC_PATH[1]);
 
@@ -38,11 +41,11 @@ async function start() {
   const cloud = {
     enabled: true,
     signedIn: () => !!auth.currentUser,
-    async signInGoogle() {
-      const provider = new authMod.GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      const result = await authMod.signInWithPopup(auth, provider);
-      return { email: result.user.email || '', verified: !!result.user.emailVerified };
+    // Email + password accounts that you create yourself in the Firebase console.
+    // Writing is limited to those accounts' IDs in firestore.rules.
+    async signInPassword(email, password) {
+      const cred = await authMod.signInWithEmailAndPassword(auth, email, password);
+      return { email: cred.user.email || '' };
     },
     signOut() {
       return authMod.signOut(auth).catch(() => {});

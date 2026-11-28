@@ -46,9 +46,9 @@ Changes appear on the kiosk immediately. The panel signs itself out after 5 minu
 
 ### Online sync with Firebase (shared across devices)
 
-When `firebase-config.js` is present, edits are saved to a free Firebase project, and every kiosk or browser that opens the page shows the same content within a few seconds. Admins sign in with **Google** (the account must use one of the approved emails), and the Firestore rules in [`firestore.rules`](firestore.rules) let only those emails write. Anyone can read, because the kiosk screens need the content.
+When `firebase-config.js` is present, edits are saved to a free Firebase project, and every kiosk or browser that opens the page shows the same content within a few seconds. Admins sign in with an **approved email and a password that you create for them** in the Firebase console (**Authentication → Users → Add user**), so nobody has to register. To change or reset someone's password, use the three-dot menu next to their row in **Authentication → Users**. The Firestore rules in [`firestore.rules`](firestore.rules) let only the listed account IDs write, so a stranger who registers with an approved email still can't save anything. Anyone can read, because the kiosk screens need the content.
 
-One-time setup in the Firebase console: create a project, register a web app and paste its config into `firebase-config.js`, create a Firestore database, enable **Authentication → Google**, add your site's domain (for example `haydenmk.github.io`) under **Authentication → Settings → Authorized domains**, and publish `firestore.rules`. When you add or remove an admin, update **both** `approved-emails.js` and `firestore.rules`.
+One-time setup in the Firebase console: create a project, register a web app and paste its config into `firebase-config.js`, create a Firestore database, enable **Authentication → Sign-in method → Email/Password** (leave "Email link" off), add your site's domain (for example `haydenmk.github.io`) under **Authentication → Settings → Authorized domains**, add each admin under **Authentication → Users**, and publish `firestore.rules` with those users' **User UID** values. When you add or remove an admin, update **both** `approved-emails.js` and the UID list in `firestore.rules`.
 
 Each browser keeps a copy of the latest content, so a kiosk that loses internet keeps showing it. If Firebase can't be loaded at all, the panel falls back to the older email + shared password sign-in and saves only in that browser.
 
@@ -58,7 +58,7 @@ Without Firebase there is no server, so edits are stored in **that kiosk browser
 
 ### Security note
 
-With Firebase on, the real protection is the Firestore rules, which check the Google sign-in on Google's servers. Without Firebase, the sign-in check runs in the browser and is **not strong security**, and since this repository is public, the emails **and the password** in `approved-emails.js` are visible to anyone. Don't use this panel to protect sensitive data.
+With Firebase on, the real protection is the Firestore rules, which check the signed-in account on Google's servers. Without Firebase, the sign-in check runs in the browser and is **not strong security**, and since this repository is public, the emails **and the password** in `approved-emails.js` are visible to anyone. Don't use this panel to protect sensitive data.
 
 ### Admin files
 

@@ -675,3 +675,18 @@ textarea.adm-input {
 }
 
 .adm-key { background: rgba(0, 108, 150, 0.55); }
+
+/* Online sign-in extras */
+.adm-login-note {
+  min-height: 0;
+  margin-top: 6px;
+  color: var(--uhmc-green);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.adm-login-extras {
+  margin-top: 12px;
+  justify-content: flex-end;
+}
