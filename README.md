@@ -12,7 +12,7 @@ Built in exact accordance with the 8-screen wireframe specifications in [`UHMC K
 | :--- | :--- | :--- |
 | **Page 1: Attract Screen** | `#view-attract` | Rotating flyer slideshow with 5 dot indicators, "Today in Ka Lama" schedule preview, featured job posting with scan-to-apply QR code, animated scrolling news ticker, and high-visibility bottom *"Touch anywhere to begin"* bar. |
 | **Page 2: Main Menu** | `#view-menu` | Top featured upcoming announcement banner, 2×3 touch tile grid (Programs, Directory, Jobs, Events, Survey, Website), and persistent bottom status bar with 60s idle countdown. |
-| **Page 3: Building Directory** | `#view-directory` | Interactive SVG floor plan for Ka Lama 1st & 2nd floors with active room highlight, walking path route from kiosk location, (+) / (−) zoom controls, search bar, and category filter chips (*Offices, Classrooms, Labs, Restrooms, Elevator & Stairs*). |
+| **Page 3: Building Directory** | `#view-directory` | Interactive SVG floor plan for Ka Lama 1st & 2nd floors with active room highlight, walking path route from kiosk location, (+) / (−) zoom controls, a **scan-to-open QR code** (bottom right of the map) that links to a picture of both floor maps (`assets/images/ka-lama-floor-maps.png`), search bar, and category filter chips (*Offices, Classrooms, Labs, Restrooms, Elevator & Stairs*). |
 | **Page 4: Business Programs** | `#view-programs` | Program overview hero banner, degrees & certificates list (*AAS, AS, CA, CO, BAS*), career paths chips, faculty advisor contact card with QR code, and bottom program selector tabs (*Business, Hospitality, Accounting, ABIT*). |
 | **Page 5: Job Opportunities** | `#view-jobs` | Selected job highlight hero card with 2×2 specs grid (*Pay, Schedule, Location, Deadline*), mobile apply QR code, job category filters (*All, Business, Hospitality, Accounting, ABIT/Tech, Internships*), and paginated job list rows. |
 | **Page 6: Events & News** | `#view-events` | Featured event flyer showcase with RSVP QR code, time filters (*This Week, This Month, Special Occasions*), and calendar event cards with month/day badges. |
@@ -85,3 +85,9 @@ Because this prototype is built with standard web technologies (HTML5, CSS3, Jav
 3. **Display Modes**:
    - Use the **Fit Window / Portrait Kiosk** button in the top bar to toggle between the 9:16 vertical bezel framing (simulating a physical 43" kiosk) and full-window mode.
    - Use the **Fullscreen** button for kiosk demonstrations.
+
+---
+
+## 🗺️ Floor-map QR code
+
+The QR code on the Building Directory opens `https://haydenmk.github.io/agile-kiosk/assets/images/ka-lama-floor-maps.png` on a visitor's phone. The picture of both floors is `assets/images/ka-lama-floor-maps.png` and the code itself is `assets/images/directory-map-qr.svg`. If the website address changes, or the floor plan changes, the image and the QR code need to be regenerated (ask Claude, or replace the two files).
