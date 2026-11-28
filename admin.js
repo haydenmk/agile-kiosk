@@ -43,8 +43,9 @@
 
   // ------------------------------------------------------------------ state
   let overlay, loginBox, panelBox, panelHeader, tabBar, bodyEl, statusEl, kbdDock, kbdToggleBtn;
-  let emailInput, passwordInput, loginErrorEl, googleBtn;
-  let passwordLoginEls = [], googleLoginEls = [];
+  let emailInput, passwordInput, confirmInput, loginErrorEl, loginNoteEl, submitBtn, loginHintEl;
+  let confirmField, extrasRow, legacyOnlyEls = [];
+  let loginMode = 'signin'; // 'signin' | 'create' (online accounts only)
   let session = null;          // { email } while someone is signed in
   let draft = null;            // working copy of the content being edited
   let activeTab = 'events';
@@ -270,8 +271,11 @@
 
   function cloudErrorText(err, saving) {
     const code = (err && err.code) || '';
-    if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return 'Sign-in was cancelled.';
-    if (code === 'auth/popup-blocked') return 'The browser blocked the sign-in pop-up. Allow pop-ups for this page and try again.';
+    if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found' || code === 'auth/invalid-email') return 'Email or password is incorrect.';
+    if (code === 'auth/email-already-in-use') return 'An account with that email already exists. Sign in, or tap Forgot password.';
+    if (code === 'auth/weak-password') return 'Choose a longer password (at least 8 characters).';
+    if (code === 'auth/too-many-requests') return 'Too many attempts. Please wait a few minutes and try again.';
+    if (code === 'auth/operation-not-allowed') return 'Email/password sign-in is not turned on in Firebase (Authentication → Sign-in method).';
     if (code === 'auth/unauthorized-domain') return 'This web address is not allowed in Firebase (Authentication → Settings → Authorized domains).';
     if (code === 'auth/network-request-failed') return 'Could not reach Google. Check the internet connection.';
     if (code === 'permission-denied') return 'Firebase refused the save: this account is not allowed to edit.';
@@ -864,6 +868,7 @@
   }
 
   function attemptLogin() {
+    if (cloudOn()) { cloudLogin(); return; }
     const now = Date.now();
     if (now < lockedUntil) {
       showLoginError(`Too many attempts. Please wait ${Math.ceil((lockedUntil - now) / 1000)} seconds.`);
@@ -903,22 +908,125 @@
     enterPanel(email);
   }
 
-  async function googleLogin() {
-    showLoginError('');
-    googleBtn.disabled = true;
+  // ---- online accounts: verified email + password (Firebase)
+  function setLoginMode(mode) {
+    loginMode = mode;
+    loginErrorEl.textContent = '';
+    loginNoteEl.textContent = '';
+    passwordInput.value = '';
+    confirmInput.value = '';
+    refreshLoginUI();
+  }
+
+  function refreshLoginUI() {
+    const online = cloudOn();
+    const creating = online && loginMode === 'create';
+    legacyOnlyEls.forEach(el => { el.hidden = online; });
+    confirmField.hidden = !creating;
+    extrasRow.hidden = !online;
+    submitBtn.textContent = creating ? 'Create account' : 'Sign in';
+    extrasRow.querySelector('[data-act="toggle"]').textContent = creating ? 'Back to sign in' : 'Create account';
+    extrasRow.querySelector('[data-act="reset"]').hidden = creating;
+    extrasRow.querySelector('[data-act="resend"]').hidden = creating;
+    passwordInput.placeholder = online ? (creating ? 'Choose a password (8+ characters)' : 'Your password') : 'Admin password';
+    loginHintEl.textContent = !online
+      ? 'Enter your approved staff email and the admin password.'
+      : creating
+        ? 'First time? Use your approved staff email and choose a password. We will email you a link to verify it.'
+        : 'Sign in with your approved staff email and your own password.';
+  }
+
+  function onApprovedList(email) {
+    return approvedEmails().includes(email);
+  }
+
+  async function cloudLogin() {
+    const email = emailInput.value.trim().toLowerCase();
+    const password = passwordInput.value;
+    loginErrorEl.textContent = '';
+    loginNoteEl.textContent = '';
+    const now = Date.now();
+    if (now < lockedUntil) {
+      showLoginError(`Too many attempts. Please wait ${Math.ceil((lockedUntil - now) / 1000)} seconds.`);
+      return;
+    }
+    if (!EMAIL_RE.test(email)) { showLoginError('Please enter a valid email address.'); return; }
+    if (!onApprovedList(email)) { showLoginError('That email is not on the approved list.'); return; }
+    if (!password) { showLoginError('Please enter your password.'); return; }
+    if (loginMode === 'create') {
+      if (password.length < 8) { showLoginError('Choose a longer password (at least 8 characters).'); return; }
+      if (password !== confirmInput.value) { showLoginError('The two passwords do not match.'); return; }
+    }
+    submitBtn.disabled = true;
     try {
-      const user = await window.KioskCloud.signInGoogle();
-      const email = String(user.email || '').trim().toLowerCase();
-      if (!user.verified || !approvedEmails().includes(email)) {
-        await window.KioskCloud.signOut();
-        showLoginError(email ? `${email} is not on the approved list.` : 'That account has no verified email.');
+      if (loginMode === 'create') {
+        await window.KioskCloud.createAccount(email, password);
+        setLoginMode('signin');
+        loginNoteEl.textContent = `Account created. We emailed a verification link to ${email}. Open it (check spam too), then sign in here.`;
         return;
       }
-      enterPanel(email);
+      const user = await window.KioskCloud.signInPassword(email, password);
+      const signedEmail = String(user.email || '').trim().toLowerCase();
+      if (!onApprovedList(signedEmail)) {
+        await window.KioskCloud.signOut();
+        showLoginError('That email is not on the approved list.');
+        return;
+      }
+      if (!user.verified) {
+        await window.KioskCloud.signOut();
+        passwordInput.value = '';
+        showLoginError('Your email is not verified yet. Open the link we emailed you, or tap Resend verification email.');
+        return;
+      }
+      failedLogins = 0;
+      passwordInput.value = '';
+      enterPanel(signedEmail);
     } catch (err) {
+      passwordInput.value = '';
+      const code = (err && err.code) || '';
+      if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
+        failedLogins++;
+        if (failedLogins >= MAX_FAILED_LOGINS) {
+          failedLogins = 0;
+          lockedUntil = Date.now() + LOCKOUT_MS;
+          showLoginError('Too many attempts. Locked for 60 seconds.');
+          return;
+        }
+      }
       showLoginError(cloudErrorText(err, false));
     } finally {
-      googleBtn.disabled = false;
+      submitBtn.disabled = false;
+    }
+  }
+
+  async function forgotPassword() {
+    const email = emailInput.value.trim().toLowerCase();
+    loginErrorEl.textContent = '';
+    loginNoteEl.textContent = '';
+    if (!EMAIL_RE.test(email)) { showLoginError('Type your email above first, then tap Forgot password.'); return; }
+    if (!onApprovedList(email)) { showLoginError('That email is not on the approved list.'); return; }
+    try {
+      await window.KioskCloud.resetPassword(email);
+      loginNoteEl.textContent = `If an account exists for ${email}, we sent a password-reset link. Check your inbox and spam.`;
+    } catch (err) {
+      showLoginError(cloudErrorText(err, false));
+    }
+  }
+
+  async function resendVerification() {
+    const email = emailInput.value.trim().toLowerCase();
+    loginErrorEl.textContent = '';
+    loginNoteEl.textContent = '';
+    if (!EMAIL_RE.test(email) || !passwordInput.value) { showLoginError('Type your email and password above first, then tap Resend verification email.'); return; }
+    if (!onApprovedList(email)) { showLoginError('That email is not on the approved list.'); return; }
+    try {
+      const result = await window.KioskCloud.resendVerification(email, passwordInput.value);
+      passwordInput.value = '';
+      loginNoteEl.textContent = result && result.alreadyVerified
+        ? 'That email is already verified. You can sign in.'
+        : `Verification email sent to ${email}. Open the link, then sign in.`;
+    } catch (err) {
+      showLoginError(cloudErrorText(err, false));
     }
   }
 
@@ -943,11 +1051,12 @@
     passwordInput.value = '';
     passwordInput.type = 'password';
     showLoginError('');
-    const online = cloudOn();
-    passwordLoginEls.forEach(el => { el.hidden = online; });
-    googleLoginEls.forEach(el => { el.hidden = !online; });
+    loginMode = 'signin';
+    confirmInput.value = '';
+    loginNoteEl.textContent = '';
+    refreshLoginUI();
     applyInputMode();
-    if (!online) setTimeout(() => emailInput.focus({ preventScroll: true }), 50);
+    setTimeout(() => emailInput.focus({ preventScroll: true }), 50);
   }
 
   // ---------------------------------------------------------- open / close
@@ -1011,30 +1120,39 @@
     });
     loginErrorEl = h('p', { class: 'adm-error', role: 'alert' });
 
-    const pwHint = h('p', { class: 'adm-hint', text: 'Enter your approved staff email and the admin password.' });
+    loginHintEl = h('p', { class: 'adm-hint', text: '' });
     const emailLabel = h('label', { class: 'adm-field' }, h('span', { class: 'adm-label', text: 'Email' }), emailInput);
     const pwField = h('div', { class: 'adm-field' },
       h('label', { class: 'adm-label', for: 'adm-password', text: 'Password' }),
       h('div', { class: 'adm-pw-row' }, passwordInput, showPasswordBtn));
-    const pwActions = h('div', { class: 'adm-login-actions' },
-      button('Cancel', () => closeAdmin(), 'ghost'),
-      button('Sign in', attemptLogin, 'primary'));
-
-    const googleHint = h('p', { class: 'adm-hint', text: 'Sign in with the Google account that uses your approved staff email.' });
-    googleBtn = button('Sign in with Google', googleLogin, 'primary');
-    googleBtn.id = 'adm-google';
-    const googleActions = h('div', { class: 'adm-login-actions' },
-      button('Cancel', () => closeAdmin(), 'ghost'),
-      googleBtn);
-    passwordLoginEls = [pwHint, emailLabel, pwField, pwActions];
-    googleLoginEls = [googleHint, googleActions];
+    confirmInput = h('input', { class: 'adm-input big', type: 'password', placeholder: 'Type the password again', id: 'adm-password2' });
+    confirmInput.setAttribute('autocomplete', 'off');
+    confirmInput.setAttribute('autocapitalize', 'none');
+    confirmInput.addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
+    confirmField = h('label', { class: 'adm-field' }, h('span', { class: 'adm-label', text: 'Confirm password' }), confirmInput);
+    confirmField.hidden = true;
+    loginNoteEl = h('p', { class: 'adm-login-note', role: 'status' });
+    submitBtn = button('Sign in', attemptLogin, 'primary');
+    submitBtn.id = 'adm-submit';
+    const actions = h('div', { class: 'adm-login-actions' }, button('Cancel', () => closeAdmin(), 'ghost'), submitBtn);
+    const extra = (label, act, fn) => {
+      const b = button(label, fn, 'ghost small');
+      b.dataset.act = act;
+      return b;
+    };
+    extrasRow = h('div', { class: 'adm-add-row adm-login-extras' },
+      extra('Create account', 'toggle', () => setLoginMode(loginMode === 'create' ? 'signin' : 'create')),
+      extra('Forgot password?', 'reset', forgotPassword),
+      extra('Resend verification email', 'resend', resendVerification));
+    extrasRow.hidden = true;
+    legacyOnlyEls = [];
 
     loginBox = h('div', { class: 'adm-login' },
       h('h2', { class: 'adm-title', text: 'Admin sign-in' }),
-      pwHint, googleHint,
-      emailLabel, pwField,
-      loginErrorEl,
-      pwActions, googleActions);
+      loginHintEl,
+      emailLabel, pwField, confirmField,
+      loginErrorEl, loginNoteEl,
+      actions, extrasRow);
 
     panelBox = h('div', { class: 'adm-panel' });
     panelBox.hidden = true;

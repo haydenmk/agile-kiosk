@@ -3,8 +3,9 @@
  *
  *  - Every kiosk reads the shared content from Firestore document kiosk/content
  *    and redraws itself whenever it changes (no sign-in needed to read).
- *  - The admin panel signs in with Google and writes edits to that document.
- *    Firestore rules (see README) accept writes only from approved emails.
+ *  - The admin panel signs in with a verified email + password and writes edits
+ *    to that document. Firestore rules (see README) accept writes only from
+ *    approved, verified emails.
  *
  * If firebase-config.js is missing, or Firebase cannot be reached, this file
  * does nothing and the kiosk keeps working from the copy saved in the browser.
@@ -31,6 +32,8 @@ async function start() {
 
   const app = appMod.initializeApp(config);
   const auth = authMod.getAuth(app);
+  // Sign-in lasts only for this tab/session, never beyond it
+  await authMod.setPersistence(auth, authMod.browserSessionPersistence).catch(() => {});
   const db = fsMod.getFirestore(app);
   const contentRef = fsMod.doc(db, DOC_PATH[0], DOC_PATH[1]);
 
@@ -38,11 +41,35 @@ async function start() {
   const cloud = {
     enabled: true,
     signedIn: () => !!auth.currentUser,
-    async signInGoogle() {
-      const provider = new authMod.GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      const result = await authMod.signInWithPopup(auth, provider);
-      return { email: result.user.email || '', verified: !!result.user.emailVerified };
+    // Email + password accounts. Writing also requires a *verified* email (see firestore.rules),
+    // so nobody can pose as an approved address without owning its inbox.
+    async signInPassword(email, password) {
+      const cred = await authMod.signInWithEmailAndPassword(auth, email, password);
+      await cred.user.reload();
+      await cred.user.getIdToken(true); // pick up the latest "email verified" status
+      return { email: cred.user.email || '', verified: !!cred.user.emailVerified };
+    },
+    async createAccount(email, password) {
+      const cred = await authMod.createUserWithEmailAndPassword(auth, email, password);
+      try {
+        await authMod.sendEmailVerification(cred.user);
+      } finally {
+        await authMod.signOut(auth).catch(() => {});
+      }
+    },
+    async resendVerification(email, password) {
+      const cred = await authMod.signInWithEmailAndPassword(auth, email, password);
+      try {
+        await cred.user.reload();
+        if (cred.user.emailVerified) return { alreadyVerified: true };
+        await authMod.sendEmailVerification(cred.user);
+        return { alreadyVerified: false };
+      } finally {
+        await authMod.signOut(auth).catch(() => {});
+      }
+    },
+    resetPassword(email) {
+      return authMod.sendPasswordResetEmail(auth, email);
     },
     signOut() {
       return authMod.signOut(auth).catch(() => {});

@@ -46,9 +46,9 @@ Changes appear on the kiosk immediately. The panel signs itself out after 5 minu
 
 ### Online sync with Firebase (shared across devices)
 
-When `firebase-config.js` is present, edits are saved to a free Firebase project, and every kiosk or browser that opens the page shows the same content within a few seconds. Admins sign in with **Google** (the account must use one of the approved emails), and the Firestore rules in [`firestore.rules`](firestore.rules) let only those emails write. Anyone can read, because the kiosk screens need the content.
+When `firebase-config.js` is present, edits are saved to a free Firebase project, and every kiosk or browser that opens the page shows the same content within a few seconds. Admins sign in with an **approved email and their own password**. Each admin taps **Create account** once, chooses a password, and clicks the verification link Firebase emails them. The Firestore rules in [`firestore.rules`](firestore.rules) let only approved emails with a *verified* address write, so nobody can pose as an admin without owning that inbox. **Forgot password?** emails a reset link. Anyone can read, because the kiosk screens need the content.
 
-One-time setup in the Firebase console: create a project, register a web app and paste its config into `firebase-config.js`, create a Firestore database, enable **Authentication → Google**, add your site's domain (for example `haydenmk.github.io`) under **Authentication → Settings → Authorized domains**, and publish `firestore.rules`. When you add or remove an admin, update **both** `approved-emails.js` and `firestore.rules`.
+One-time setup in the Firebase console: create a project, register a web app and paste its config into `firebase-config.js`, create a Firestore database, enable **Authentication → Sign-in method → Email/Password** (leave "Email link" off), add your site's domain (for example `haydenmk.github.io`) under **Authentication → Settings → Authorized domains**, and publish `firestore.rules`. When you add or remove an admin, update **both** `approved-emails.js` and `firestore.rules`.
 
 Each browser keeps a copy of the latest content, so a kiosk that loses internet keeps showing it. If Firebase can't be loaded at all, the panel falls back to the older email + shared password sign-in and saves only in that browser.
 
