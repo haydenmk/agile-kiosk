@@ -43,9 +43,8 @@
 
   // ------------------------------------------------------------------ state
   let overlay, loginBox, panelBox, panelHeader, tabBar, bodyEl, statusEl, kbdDock, kbdToggleBtn;
-  let emailInput, passwordInput, confirmInput, loginErrorEl, loginNoteEl, submitBtn, loginHintEl;
-  let confirmField, extrasRow, legacyOnlyEls = [];
-  let loginMode = 'signin'; // 'signin' | 'create' (online accounts only)
+  let emailInput, passwordInput, loginErrorEl, loginNoteEl, submitBtn, loginHintEl;
+  let extrasRow;
   let session = null;          // { email } while someone is signed in
   let draft = null;            // working copy of the content being edited
   let activeTab = 'events';
@@ -908,32 +907,14 @@
     enterPanel(email);
   }
 
-  // ---- online accounts: verified email + password (Firebase)
-  function setLoginMode(mode) {
-    loginMode = mode;
-    loginErrorEl.textContent = '';
-    loginNoteEl.textContent = '';
-    passwordInput.value = '';
-    confirmInput.value = '';
-    refreshLoginUI();
-  }
-
+  // ---- online accounts: email + password (Firebase)
   function refreshLoginUI() {
     const online = cloudOn();
-    const creating = online && loginMode === 'create';
-    legacyOnlyEls.forEach(el => { el.hidden = online; });
-    confirmField.hidden = !creating;
     extrasRow.hidden = !online;
-    submitBtn.textContent = creating ? 'Create account' : 'Sign in';
-    extrasRow.querySelector('[data-act="toggle"]').textContent = creating ? 'Back to sign in' : 'Create account';
-    extrasRow.querySelector('[data-act="reset"]').hidden = creating;
-    extrasRow.querySelector('[data-act="resend"]').hidden = creating;
-    passwordInput.placeholder = online ? (creating ? 'Choose a password (8+ characters)' : 'Your password') : 'Admin password';
-    loginHintEl.textContent = !online
-      ? 'Enter your approved staff email and the admin password.'
-      : creating
-        ? 'First time? Use your approved staff email and choose a password. We will email you a link to verify it.'
-        : 'Sign in with your approved staff email and your own password.';
+    passwordInput.placeholder = online ? 'Your password' : 'Admin password';
+    loginHintEl.textContent = online
+      ? 'Sign in with your approved staff email and your password.'
+      : 'Enter your approved staff email and the admin password.';
   }
 
   function onApprovedList(email) {
@@ -953,29 +934,13 @@
     if (!EMAIL_RE.test(email)) { showLoginError('Please enter a valid email address.'); return; }
     if (!onApprovedList(email)) { showLoginError('That email is not on the approved list.'); return; }
     if (!password) { showLoginError('Please enter your password.'); return; }
-    if (loginMode === 'create') {
-      if (password.length < 8) { showLoginError('Choose a longer password (at least 8 characters).'); return; }
-      if (password !== confirmInput.value) { showLoginError('The two passwords do not match.'); return; }
-    }
     submitBtn.disabled = true;
     try {
-      if (loginMode === 'create') {
-        await window.KioskCloud.createAccount(email, password);
-        setLoginMode('signin');
-        loginNoteEl.textContent = `Account created. We emailed a verification link to ${email}. Open it (check spam too), then sign in here.`;
-        return;
-      }
       const user = await window.KioskCloud.signInPassword(email, password);
       const signedEmail = String(user.email || '').trim().toLowerCase();
       if (!onApprovedList(signedEmail)) {
         await window.KioskCloud.signOut();
         showLoginError('That email is not on the approved list.');
-        return;
-      }
-      if (!user.verified) {
-        await window.KioskCloud.signOut();
-        passwordInput.value = '';
-        showLoginError('Your email is not verified yet. Open the link we emailed you, or tap Resend verification email.');
         return;
       }
       failedLogins = 0;
@@ -1013,23 +978,6 @@
     }
   }
 
-  async function resendVerification() {
-    const email = emailInput.value.trim().toLowerCase();
-    loginErrorEl.textContent = '';
-    loginNoteEl.textContent = '';
-    if (!EMAIL_RE.test(email) || !passwordInput.value) { showLoginError('Type your email and password above first, then tap Resend verification email.'); return; }
-    if (!onApprovedList(email)) { showLoginError('That email is not on the approved list.'); return; }
-    try {
-      const result = await window.KioskCloud.resendVerification(email, passwordInput.value);
-      passwordInput.value = '';
-      loginNoteEl.textContent = result && result.alreadyVerified
-        ? 'That email is already verified. You can sign in.'
-        : `Verification email sent to ${email}. Open the link, then sign in.`;
-    } catch (err) {
-      showLoginError(cloudErrorText(err, false));
-    }
-  }
-
   function enterPanel(email) {
     session = { email };
     draft = window.KioskApp.getContent();
@@ -1051,8 +999,6 @@
     passwordInput.value = '';
     passwordInput.type = 'password';
     showLoginError('');
-    loginMode = 'signin';
-    confirmInput.value = '';
     loginNoteEl.textContent = '';
     refreshLoginUI();
     applyInputMode();
@@ -1125,12 +1071,6 @@
     const pwField = h('div', { class: 'adm-field' },
       h('label', { class: 'adm-label', for: 'adm-password', text: 'Password' }),
       h('div', { class: 'adm-pw-row' }, passwordInput, showPasswordBtn));
-    confirmInput = h('input', { class: 'adm-input big', type: 'password', placeholder: 'Type the password again', id: 'adm-password2' });
-    confirmInput.setAttribute('autocomplete', 'off');
-    confirmInput.setAttribute('autocapitalize', 'none');
-    confirmInput.addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
-    confirmField = h('label', { class: 'adm-field' }, h('span', { class: 'adm-label', text: 'Confirm password' }), confirmInput);
-    confirmField.hidden = true;
     loginNoteEl = h('p', { class: 'adm-login-note', role: 'status' });
     submitBtn = button('Sign in', attemptLogin, 'primary');
     submitBtn.id = 'adm-submit';
@@ -1141,16 +1081,13 @@
       return b;
     };
     extrasRow = h('div', { class: 'adm-add-row adm-login-extras' },
-      extra('Create account', 'toggle', () => setLoginMode(loginMode === 'create' ? 'signin' : 'create')),
-      extra('Forgot password?', 'reset', forgotPassword),
-      extra('Resend verification email', 'resend', resendVerification));
+      extra('Forgot password?', 'reset', forgotPassword));
     extrasRow.hidden = true;
-    legacyOnlyEls = [];
 
     loginBox = h('div', { class: 'adm-login' },
       h('h2', { class: 'adm-title', text: 'Admin sign-in' }),
       loginHintEl,
-      emailLabel, pwField, confirmField,
+      emailLabel, pwField,
       loginErrorEl, loginNoteEl,
       actions, extrasRow);
 

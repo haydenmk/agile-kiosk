@@ -2,20 +2,20 @@ rules_version = '2';
 
 // Paste this into Firebase console -> Build -> Firestore Database -> Rules -> Publish.
 // Anyone may READ the kiosk content (the kiosk screens need it).
-// Only these email accounts, and only once the email is verified, may WRITE it.
-// Keep the email list in sync with approved-emails.js.
+// Only the admin accounts listed below may WRITE it. Each entry is a "User UID"
+// copied from Firebase console -> Build -> Authentication -> Users (add the admin
+// there first with their email and a password). Replace the placeholders.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /kiosk/content {
       allow read: if true;
       allow write: if request.auth != null
-        && request.auth.token.email_verified == true
-        && request.auth.token.email.lower() in [
-          'haydenmk@hawaii.edu',
-          'anpicana@hawaii.edu',
-          'toddhy@hawaii.edu',
-          'bgaoiran@hawaii.edu',
-          'vdoming@hawaii.edu'
+        && request.auth.uid in [
+          'UID-FOR-haydenmk@hawaii.edu',
+          'UID-FOR-anpicana@hawaii.edu',
+          'UID-FOR-toddhy@hawaii.edu',
+          'UID-FOR-bgaoiran@hawaii.edu',
+          'UID-FOR-vdoming@hawaii.edu'
         ];
     }
   }

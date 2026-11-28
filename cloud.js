@@ -3,9 +3,9 @@
  *
  *  - Every kiosk reads the shared content from Firestore document kiosk/content
  *    and redraws itself whenever it changes (no sign-in needed to read).
- *  - The admin panel signs in with a verified email + password and writes edits
- *    to that document. Firestore rules (see README) accept writes only from
- *    approved, verified emails.
+ *  - The admin panel signs in with an email + password account (created by you in
+ *    the Firebase console) and writes edits to that document. Firestore rules
+ *    (see README) accept writes only from those accounts.
  *
  * If firebase-config.js is missing, or Firebase cannot be reached, this file
  * does nothing and the kiosk keeps working from the copy saved in the browser.
@@ -41,32 +41,11 @@ async function start() {
   const cloud = {
     enabled: true,
     signedIn: () => !!auth.currentUser,
-    // Email + password accounts. Writing also requires a *verified* email (see firestore.rules),
-    // so nobody can pose as an approved address without owning its inbox.
+    // Email + password accounts that you create yourself in the Firebase console.
+    // Writing is limited to those accounts' IDs in firestore.rules.
     async signInPassword(email, password) {
       const cred = await authMod.signInWithEmailAndPassword(auth, email, password);
-      await cred.user.reload();
-      await cred.user.getIdToken(true); // pick up the latest "email verified" status
-      return { email: cred.user.email || '', verified: !!cred.user.emailVerified };
-    },
-    async createAccount(email, password) {
-      const cred = await authMod.createUserWithEmailAndPassword(auth, email, password);
-      try {
-        await authMod.sendEmailVerification(cred.user);
-      } finally {
-        await authMod.signOut(auth).catch(() => {});
-      }
-    },
-    async resendVerification(email, password) {
-      const cred = await authMod.signInWithEmailAndPassword(auth, email, password);
-      try {
-        await cred.user.reload();
-        if (cred.user.emailVerified) return { alreadyVerified: true };
-        await authMod.sendEmailVerification(cred.user);
-        return { alreadyVerified: false };
-      } finally {
-        await authMod.signOut(auth).catch(() => {});
-      }
+      return { email: cred.user.email || '' };
     },
     resetPassword(email) {
       return authMod.sendPasswordResetEmail(auth, email);
