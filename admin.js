@@ -43,7 +43,8 @@
 
   // ------------------------------------------------------------------ state
   let overlay, loginBox, panelBox, panelHeader, tabBar, bodyEl, statusEl, kbdDock, kbdToggleBtn;
-  let emailInput, passwordInput, loginErrorEl;
+  let emailInput, passwordInput, loginErrorEl, googleBtn;
+  let passwordLoginEls = [], googleLoginEls = [];
   let session = null;          // { email } while someone is signed in
   let draft = null;            // working copy of the content being edited
   let activeTab = 'events';
@@ -258,8 +259,35 @@
     if (!session || !draft) return;
     draft.meta = { updatedBy: session.email, updatedAt: new Date().toISOString() };
     const saved = window.KioskApp.applyContent(draft);
-    if (saved) setStatus('ok', `Saved ${formatTime(new Date())}`);
+    if (cloudOn()) pushToCloud(draft);
+    else if (saved) setStatus('ok', `Saved ${formatTime(new Date())}`);
     else setStatus('error', 'Shown on kiosk, but this browser would not save it');
+  }
+
+  // ---------------------------------------------------- online sync (Firebase)
+  const cloudOn = () => !!(window.KioskCloud && window.KioskCloud.enabled);
+  let pushSeq = 0;
+
+  function cloudErrorText(err, saving) {
+    const code = (err && err.code) || '';
+    if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return 'Sign-in was cancelled.';
+    if (code === 'auth/popup-blocked') return 'The browser blocked the sign-in pop-up. Allow pop-ups for this page and try again.';
+    if (code === 'auth/unauthorized-domain') return 'This web address is not allowed in Firebase (Authentication → Settings → Authorized domains).';
+    if (code === 'auth/network-request-failed') return 'Could not reach Google. Check the internet connection.';
+    if (code === 'permission-denied') return 'Firebase refused the save: this account is not allowed to edit.';
+    if (code === 'kiosk/timeout') return 'Shown on kiosk, but not confirmed online yet. Check the internet connection.';
+    return saving ? 'Shown on kiosk, but the online save failed.' : 'Sign-in failed. Please try again.';
+  }
+
+  // Save to Firebase so every kiosk and device gets the change.
+  function pushToCloud(content) {
+    const seq = ++pushSeq;
+    setStatus('pending', 'Saving online…');
+    window.KioskCloud.save(content).then(() => {
+      if (seq === pushSeq) setStatus('ok', `Saved online ${formatTime(new Date())}`);
+    }).catch(err => {
+      if (seq === pushSeq) setStatus('error', cloudErrorText(err, true));
+    });
   }
 
   // ------------------------------------------------------------------ tabs
@@ -671,7 +699,9 @@
     });
 
     return h('div', null,
-      section('Where your edits live', 'Edits are saved in this kiosk browser and are shown the next time it opens. They are lost if the browser\'s site data is cleared, if it runs in private mode, or on a different browser/device. Download a backup after big changes.',
+      section('Where your edits live', cloudOn()
+        ? 'Edits are saved online (Firebase), so every kiosk and device that opens this page shows the same content within a few seconds. Each browser also keeps a copy so the kiosk still works if the internet drops. Download a backup after big changes.'
+        : 'Edits are saved in this kiosk browser and are shown the next time it opens. They are lost if the browser\'s site data is cleared, if it runs in private mode, or on a different browser/device. Download a backup after big changes.',
         h('p', { class: 'adm-hint strong', text: meta })),
       section('Download a backup', 'Saves all of your edits to a .json file.',
         button('Download backup file', () => {
@@ -691,7 +721,8 @@
         confirmButton('Reset everything to defaults', 'Tap again to erase all edits', () => {
           window.KioskApp.resetToDefaults();
           draft = window.KioskApp.getContent();
-          setStatus('ok', 'Reset to defaults');
+          if (cloudOn()) pushToCloud(draft);
+          else setStatus('ok', 'Reset to defaults');
           showMessage('Everything was reset to the defaults.', false);
           renderBody(messageEl.textContent);
         }, 'danger')),
@@ -869,6 +900,29 @@
 
     failedLogins = 0;
     passwordInput.value = '';
+    enterPanel(email);
+  }
+
+  async function googleLogin() {
+    showLoginError('');
+    googleBtn.disabled = true;
+    try {
+      const user = await window.KioskCloud.signInGoogle();
+      const email = String(user.email || '').trim().toLowerCase();
+      if (!user.verified || !approvedEmails().includes(email)) {
+        await window.KioskCloud.signOut();
+        showLoginError(email ? `${email} is not on the approved list.` : 'That account has no verified email.');
+        return;
+      }
+      enterPanel(email);
+    } catch (err) {
+      showLoginError(cloudErrorText(err, false));
+    } finally {
+      googleBtn.disabled = false;
+    }
+  }
+
+  function enterPanel(email) {
     session = { email };
     draft = window.KioskApp.getContent();
     activeTab = 'events';
@@ -889,8 +943,11 @@
     passwordInput.value = '';
     passwordInput.type = 'password';
     showLoginError('');
+    const online = cloudOn();
+    passwordLoginEls.forEach(el => { el.hidden = online; });
+    googleLoginEls.forEach(el => { el.hidden = !online; });
     applyInputMode();
-    setTimeout(() => emailInput.focus({ preventScroll: true }), 50);
+    if (!online) setTimeout(() => emailInput.focus({ preventScroll: true }), 50);
   }
 
   // ---------------------------------------------------------- open / close
@@ -909,6 +966,7 @@
     session = null;
     draft = null;
     lastField = null;
+    if (cloudOn()) window.KioskCloud.signOut();
     overlay.classList.remove('open');
     panelBox.replaceChildren();
     window.KioskApp.setAdminOpen(false);
@@ -953,17 +1011,30 @@
     });
     loginErrorEl = h('p', { class: 'adm-error', role: 'alert' });
 
+    const pwHint = h('p', { class: 'adm-hint', text: 'Enter your approved staff email and the admin password.' });
+    const emailLabel = h('label', { class: 'adm-field' }, h('span', { class: 'adm-label', text: 'Email' }), emailInput);
+    const pwField = h('div', { class: 'adm-field' },
+      h('label', { class: 'adm-label', for: 'adm-password', text: 'Password' }),
+      h('div', { class: 'adm-pw-row' }, passwordInput, showPasswordBtn));
+    const pwActions = h('div', { class: 'adm-login-actions' },
+      button('Cancel', () => closeAdmin(), 'ghost'),
+      button('Sign in', attemptLogin, 'primary'));
+
+    const googleHint = h('p', { class: 'adm-hint', text: 'Sign in with the Google account that uses your approved staff email.' });
+    googleBtn = button('Sign in with Google', googleLogin, 'primary');
+    googleBtn.id = 'adm-google';
+    const googleActions = h('div', { class: 'adm-login-actions' },
+      button('Cancel', () => closeAdmin(), 'ghost'),
+      googleBtn);
+    passwordLoginEls = [pwHint, emailLabel, pwField, pwActions];
+    googleLoginEls = [googleHint, googleActions];
+
     loginBox = h('div', { class: 'adm-login' },
       h('h2', { class: 'adm-title', text: 'Admin sign-in' }),
-      h('p', { class: 'adm-hint', text: 'Enter your approved staff email and the admin password.' }),
-      h('label', { class: 'adm-field' }, h('span', { class: 'adm-label', text: 'Email' }), emailInput),
-      h('div', { class: 'adm-field' },
-        h('label', { class: 'adm-label', for: 'adm-password', text: 'Password' }),
-        h('div', { class: 'adm-pw-row' }, passwordInput, showPasswordBtn)),
+      pwHint, googleHint,
+      emailLabel, pwField,
       loginErrorEl,
-      h('div', { class: 'adm-login-actions' },
-        button('Cancel', () => closeAdmin(), 'ghost'),
-        button('Sign in', attemptLogin, 'primary')));
+      pwActions, googleActions);
 
     panelBox = h('div', { class: 'adm-panel' });
     panelBox.hidden = true;

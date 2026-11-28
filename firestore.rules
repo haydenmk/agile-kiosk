@@ -1,0 +1,22 @@
+rules_version = '2';
+
+// Paste this into Firebase console -> Build -> Firestore Database -> Rules -> Publish.
+// Anyone may READ the kiosk content (the kiosk screens need it).
+// Only these Google accounts (with a verified email) may WRITE it.
+// Keep the email list in sync with approved-emails.js.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /kiosk/content {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() in [
+          'haydenmk@hawaii.edu',
+          'anpicana@hawaii.edu',
+          'toddhy@hawaii.edu',
+          'bgaoiran@hawaii.edu',
+          'vdoming@hawaii.edu'
+        ];
+    }
+  }
+}
